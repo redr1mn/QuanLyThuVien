@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* CSS tùy chỉnh cho các React Component */
+.react-badge {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+[data-react-component] {
+  min-height: 50px;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.04);
+}

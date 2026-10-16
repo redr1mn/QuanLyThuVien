@@ -1,8 +1,72 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Trang chủ - Quản Lý Thư Viện (React + ASP.NET Core MVC)";
+
+    // Dữ liệu mẫu từ ASP.NET Core Controller / Razor Model truyền sang React Component
+    var initialBooksData = new[]
+    {
+        new { id = 101, title = "ASP.NET Core in Action (3rd Edition)", author = "Andrew Lock", category = "Công nghệ thông tin", isAvailable = true },
+        new { id = 102, title = "React 18 Design Patterns and Best Practices", author = "Carlos Santana", category = "Frontend", isAvailable = true },
+        new { id = 103, title = "Domain-Driven Design: Tackling Complexity", author = "Eric Evans", category = "Kiến trúc phần mềm", isAvailable = false },
+        new { id = 104, title = "Clean Code: A Handbook of Agile Software Craftsmanship", author = "Robert C. Martin", category = "Công nghệ thông tin", isAvailable = true }
+    };
+    var initialBooksJson = System.Text.Json.JsonSerializer.Serialize(initialBooksData);
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-2">
+    <!-- Header thông tin công nghệ -->
+    <div class="p-4 mb-4 bg-light rounded-3 border shadow-sm">
+        <div class="container-fluid py-2">
+            <h1 class="display-6 fw-bold text-primary">
+                <span class="text-danger">.NET Core MVC</span> + <span class="text-info">⚛️ React 18</span>
+            </h1>
+            <p class="col-md-10 fs-6 text-muted">
+                Dự án đã được tích hợp thành công mô hình <strong>Hybrid React Components</strong> với <strong>Vite & TypeScript</strong>.
+                Bạn có thể giữ nguyên toàn bộ Razor Views/Controllers hiện có và nhúng các React components tương tác cao vào bất cứ trang nào!
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-primary">Vite 6</span>
+                <span class="badge bg-info text-dark">React 18</span>
+                <span class="badge bg-secondary">TypeScript</span>
+                <span class="badge bg-success">Hot Module Replacement (HMR)</span>
+                <span class="badge bg-dark">ASP.NET Core MVC</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nhúng React Component 1: BookManager -->
+    <div class="mb-4">
+        <!-- Thuộc tính data-react-component sẽ được main.tsx tự động phát hiện và render -->
+        <div data-react-component="BookManager" 
+             data-props='{"title": "Hệ Thống Sách Thư Viện (Dữ liệu truyền từ Razor Model)", "initialBooks": @Html.Raw(initialBooksJson)}'>
+            <div class="alert alert-secondary text-center py-4">
+                <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+                Đang tải React BookManager Component...
+            </div>
+        </div>
+    </div>
+
+    <!-- Nhúng React Component 2: Counter -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div data-react-component="Counter" 
+                 data-props='{"initialCount": 42, "title": "Bộ đếm Sách mượn hôm nay"}'>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card h-100 shadow-sm border-0 bg-white">
+                <div class="card-body">
+                    <h5 class="card-title text-success">💡 Cách sử dụng trong Razor View</h5>
+                    <p class="card-text text-muted small">
+                        Để nhúng component vào bất kỳ view <code>.cshtml</code> nào:
+                    </p>
+                    <pre class="bg-light p-2 rounded small text-dark border"><code>&lt;div data-react-component="TênComponent"
+     data-props='@@Json.Serialize(modelData)'&gt;
+&lt;/div&gt;</code></pre>
+                    <p class="small text-muted mb-0">
+                        Khi phát triển frontend với Fast Refresh: Chạy <code>npm run dev</code> trong thư mục <code>ClientApp</code>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
