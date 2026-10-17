@@ -5,6 +5,7 @@
     var devServerUrl = Config.GetValue<string>("Vite:ServerUrl", "http://localhost:5173");
     var isDevServerExplicit = Config.GetValue<bool?>("Vite:DevServer", null);
     var distJsPath = System.IO.Path.Combine(Env.WebRootPath, "dist", "assets", "main.js");
+    var distIndexCssPath = System.IO.Path.Combine(Env.WebRootPath, "dist", "assets", "index.css");
     var distCssPath = System.IO.Path.Combine(Env.WebRootPath, "dist", "assets", "main.css");
     var hasDistBuild = System.IO.File.Exists(distJsPath);
 
@@ -29,6 +30,10 @@
 else
 {
     @* Production Bundle từ wwwroot/dist *@
+    @if (System.IO.File.Exists(distIndexCssPath))
+    {
+        <link rel="stylesheet" href="~/dist/assets/index.css" asp-append-version="true" />
+    }
     @if (System.IO.File.Exists(distCssPath))
     {
         <link rel="stylesheet" href="~/dist/assets/main.css" asp-append-version="true" />

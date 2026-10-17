@@ -1,0 +1,32 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
+@{
+    var preview = Environment.IsDevelopment();
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var groups = new[] {
+        (Controller: "Reader", Label: "Độc giả", Visible: preview || User.IsInRole("Reader"),
+            Links: new[] { (Action: "Account", Label: "Tài khoản độc giả") }),
+        (Controller: "Staff", Label: "Nghiệp vụ thư viện", Visible: preview || User.IsInRole("Staff") || User.IsInRole("Admin"),
+            Links: new[] { (Action: "Books", Label: "Quản lý sách"), (Action: "Readers", Label: "Quản lý độc giả & Thẻ"), (Action: "Circulation", Label: "Mượn trả sách") }),
+        (Controller: "Admin", Label: "Quản trị", Visible: preview || User.IsInRole("Admin"),
+            Links: new[] { (Action: "Reports", Label: "Thống kê & Báo cáo"), (Action: "Users", Label: "Nhân viên & Phân quyền"), (Action: "Settings", Label: "Cấu hình hệ thống") })
+    };
+}
+@foreach (var group in groups.Where(group => group.Visible))
+{
+    <div class="dropdown library-nav-group">
+        <button class="library-nav-link dropdown-toggle @(controller == group.Controller ? "is-current" : "")"
+                type="button" id="navigation-@group.Controller" data-bs-toggle="dropdown" aria-expanded="false">
+            @group.Label
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="navigation-@group.Controller">
+            @foreach (var link in group.Links)
+            {
+                <li>
+                    <a class="dropdown-item" asp-area="" asp-controller="@group.Controller" asp-action="@link.Action"
+                       aria-current="@(controller == group.Controller && action == link.Action ? "page" : null)">@link.Label</a>
+                </li>
+            }
+        </ul>
+    </div>
+}

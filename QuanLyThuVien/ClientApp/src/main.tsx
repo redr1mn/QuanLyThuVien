@@ -1,13 +1,11 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import Counter from './components/Counter';
-import BookManager from './components/BookManager';
+import BookCatalog from './components/BookCatalog';
 
 // Danh sách các React components có thể nhúng vào Razor Views
 const componentRegistry: Record<string, React.ComponentType<any>> = {
-  Counter,
-  BookManager,
+  BookCatalog,
 };
 
 // Hàm tự động mount các components theo thuộc tính data-react-component

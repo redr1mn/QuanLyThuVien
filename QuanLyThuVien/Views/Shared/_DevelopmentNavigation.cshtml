@@ -1,0 +1,29 @@
+@* Chỉ gọi partial này trong môi trường Development. Không giả lập đăng nhập hoặc vai trò. *@
+@{
+    // Chỉ giữ những trang chưa có trong menu tài khoản của người dùng hiện tại.
+    var hasStaffMenu = User.Identity?.IsAuthenticated == true && (User.IsInRole("Staff") || User.IsInRole("Admin"));
+    var hasAdminMenu = User.Identity?.IsAuthenticated == true && User.IsInRole("Admin");
+    var hasReaderMenu = User.Identity?.IsAuthenticated == true && User.IsInRole("Reader");
+    var links = new[] {
+        (Controller: "Reader", Action: "Account", Label: "Tài khoản độc giả", Visible: !hasReaderMenu),
+        (Controller: "Staff", Action: "Books", Label: "Quản lý sách", Visible: !hasStaffMenu),
+        (Controller: "Staff", Action: "Readers", Label: "Quản lý độc giả & Thẻ", Visible: !hasStaffMenu),
+        (Controller: "Staff", Action: "Circulation", Label: "Mượn trả sách", Visible: !hasStaffMenu),
+        (Controller: "Admin", Action: "Reports", Label: "Thống kê & Báo cáo", Visible: !hasAdminMenu),
+        (Controller: "Admin", Action: "Users", Label: "Nhân viên & Phân quyền", Visible: !hasAdminMenu),
+        (Controller: "Admin", Action: "Settings", Label: "Cấu hình hệ thống", Visible: !hasAdminMenu)
+    };
+}
+@if (links.Any(link => link.Visible))
+{
+<div class="dropdown library-development-navigation">
+    <button class="library-account-button dropdown-toggle" type="button" id="development-pages-menu"
+            data-bs-toggle="dropdown" aria-expanded="false">Trang đang phát triển</button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="development-pages-menu">
+        @foreach (var link in links.Where(link => link.Visible))
+        {
+            <li><a class="dropdown-item" asp-controller="@link.Controller" asp-action="@link.Action">@link.Label</a></li>
+        }
+    </ul>
+</div>
+}
