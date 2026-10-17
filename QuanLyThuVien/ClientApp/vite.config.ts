@@ -3,10 +3,10 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
+    // Cổng cố định phải khớp Vite:ServerUrl; không tự nhảy cổng vì Razor sẽ tiếp tục nạp URL đã cấu hình.
     port: 5173,
     strictPort: true,
     cors: true,
@@ -22,6 +22,7 @@ export default defineConfig({
     manifest: true,
     rollupOptions: {
       input: {
+        // main mount widget qua registry; index mount riêng catalog. Tên entry được Razor tham chiếu trực tiếp.
         main: path.resolve(__dirname, 'src/main.tsx'),
         index: path.resolve(__dirname, 'src/index.tsx'),
       },

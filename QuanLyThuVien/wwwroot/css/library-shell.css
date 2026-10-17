@@ -1,8 +1,4 @@
-/* ==========================================================================
-   library-shell.css
-   Khung trang (header / dropdown tài khoản / footer) đồng bộ với BookCatalog.tsx
-   Nạp SAU site.css để ghi đè các class library-* cũ.
-   ========================================================================== */
+/* Nạp sau site.css để các token và quy tắc navbar ở đây được ưu tiên hơn shell cũ. */
 
 /* Khung các trang nghiệp vụ đang chuẩn bị triển khai. */
 .library-page {
@@ -111,7 +107,7 @@ body.library-shell {
     font-size: .875rem;
 }
 
-/* ---------- Focus & skip link ---------- */
+/* Giữ focus nhìn thấy khi dùng bàn phím, kể cả các nút navbar đã bỏ đường viền. */
 .library-shell a:focus-visible,
 .library-shell button:focus-visible {
     outline: 2px solid var(--oxblood);
@@ -141,8 +137,7 @@ body.library-shell {
     outline-offset: -2px;
 }
 
-/* ---------- Masthead ----------
-   Không sticky: sidebar của trang sách đã sticky top-0 h-screen. */
+/* Header không sticky vì sidebar catalog đã bám top: 0; tránh hai vùng cố định che nội dung nhau. */
 .library-header {
     border-bottom: 1px solid var(--rule);
     background: var(--paper);
@@ -159,7 +154,6 @@ body.library-shell {
     border-bottom: 0; /* đường kẻ đã nằm ở .library-header */
 }
 
-/* Logo bên trái, nhóm điều hướng ở giữa và tài khoản bên phải. */
 .library-brand {
     display: flex;
     flex: 1 1 auto;
@@ -197,7 +191,6 @@ body.library-shell {
     text-box-edge: cap alphabetic;
 }
 
-/* Nút mở menu trên mobile */
 .library-masthead .navbar-toggler {
     margin: 0;
     padding: 0 1.25rem;
@@ -225,7 +218,6 @@ body.library-shell {
         text-underline-offset: .4em;
     }
 
-/* Vùng thu gọn */
 .library-navigation {
     flex-basis: 100%;
     gap: 0;
@@ -267,7 +259,7 @@ body.library-shell {
     text-align: center;
     white-space: nowrap;
 }
-.library-nav-group > button::after { margin-left: .5rem; }
+.library-header .dropdown-toggle::after { display: none; }
 .library-nav-group .dropdown-menu { position: static; }
 
     .library-nav-link:hover {
@@ -315,7 +307,6 @@ body.library-shell {
     transition: background-color .2s, color .2s;
 }
 
-/* Giữ nút Đăng nhập nền mực đậm như thiết kế trước. */
 .library-login {
     background: var(--ink);
     color: var(--paper);
@@ -350,6 +341,7 @@ body.library-shell {
     }
 
 .library-account-name {
+    /* Đặt ellipsis và underline trên tên, tách khỏi mũi tên để tên dài không đẩy/cắt biểu tượng. */
     display: block;
     min-width: 0;
     overflow: hidden;
@@ -364,6 +356,7 @@ body.library-shell {
 }
 
     .library-account-button.dropdown-toggle::after {
+        /* Không dùng margin-left: auto: tên dài/ngắn vẫn cách mũi tên cùng khoảng gap của nút. */
         flex: none;
         margin-left: 0;
         padding-left: 0;
@@ -372,7 +365,6 @@ body.library-shell {
         content: "▾";
     }
 
-/* ---------- Menu tài khoản ---------- */
 :is(.library-account, .library-nav) .dropdown-menu {
     min-width: 17.5rem;
     margin-top: -1px !important;
@@ -521,7 +513,6 @@ body.library-shell {
     .library-login { padding-inline: 12px; }
 }
 
-/* ---------- Footer / Colophon ---------- */
 .library-footer {
     flex: none;
     border-top: 1px solid var(--rule);
@@ -558,7 +549,6 @@ body.library-shell {
         color: var(--ink);
     }
 
-/* Đoạn nội quy có vạch lề oxblood như phần tóm tắt trong hồ sơ sách */
 #library-rules p {
     padding-left: 1rem;
     border-left: 2px solid var(--oxblood);

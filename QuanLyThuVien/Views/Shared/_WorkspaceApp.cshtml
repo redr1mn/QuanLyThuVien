@@ -1,0 +1,13 @@
+@{
+    var role = User.IsInRole("Staff") ? "Staff" : User.IsInRole("Admin") ? "Admin" : User.IsInRole("Reader") ? "Reader" : "Preview";
+    var props = System.Text.Json.JsonSerializer.Serialize(new {
+        page = ViewData["WorkspacePage"],
+        tab = ViewData["ActiveTab"] ?? "",
+        role,
+        baseUrl = Url.Content("~/")
+    });
+}
+<div data-react-component="Workspace" data-props="@props">
+    <p role="status">Đang mở sổ dữ liệu…</p>
+</div>
+<noscript>Bật JavaScript để sử dụng bảng dữ liệu và các biểu mẫu của bản thực hành.</noscript>

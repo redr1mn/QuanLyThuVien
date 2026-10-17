@@ -1,7 +1,8 @@
 @{
+    ViewData["WorkspacePage"] = "books";
     ViewData["Title"] = "Quản lý sách";
 }
 <section class="library-page" aria-labelledby="page-title">
     <h1 id="page-title">@ViewData["Title"]</h1>
-    @* TODO: Danh sách, tìm kiếm, bộ lọc và form thêm/sửa sách. *@
+    <partial name="_WorkspaceApp" />
 </section>
