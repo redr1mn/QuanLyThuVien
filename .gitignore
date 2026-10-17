@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Node / Vite Frontend
+**/node_modules/
+**/ClientApp/dist/
+**/wwwroot/dist/
+.vite/

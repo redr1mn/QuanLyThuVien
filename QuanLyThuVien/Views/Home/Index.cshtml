@@ -1,8 +1,32 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@*
+    Views/Home/Index.cshtml
+    - Truyền Model từ Controller sang React qua thẻ <script type="application/json">.
+    - Đổi kiểu @model cho khớp với entity trong dự án của bạn (QuanLyThuVien.Models.Book).
+    - Property của Book cần khớp interface Book trong BookCatalog.tsx (tự chuyển camelCase):
+      Id, Title, Author, Category, Publisher, PublishYear, Price, Location,
+      AvailableQuantity, TotalQuantity, CoverImage, Description.
+    - Nếu Model null hoặc rỗng, React tự dùng dữ liệu mẫu.
+*@
+@model IEnumerable<QuanLyThuVien.Models.Book>?
+
+@{
+    ViewData["Title"] = "Tra Cứu & Chi Tiết Sách Thư Viện";
+
+    var jsonOptions = new System.Text.Json.JsonSerializerOptions
+    {
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+    };
+    // Thay "<" bằng \u003c để chuỗi JSON không thể đóng sớm thẻ <script> (chống XSS)
+    var booksJson = Model is null
+        ? "[]"
+        : System.Text.Json.JsonSerializer.Serialize(Model, jsonOptions).Replace("<", "\\u003c");
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<div id="book-catalog-root"></div>
+
+<script id="book-data" type="application/json">@Html.Raw(booksJson)</script>
+
+@section Scripts {
+    @* Trỏ tới file bundle của bạn. Ví dụ Vite: ~/dist/assets/index.js ; CRA: ~/static/js/main.js *@
+    <script type="module" src="~/dist/assets/index.js" asp-append-version="true"></script>
+}

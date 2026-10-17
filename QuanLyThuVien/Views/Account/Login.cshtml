@@ -1,0 +1,84 @@
+@model LoginViewModel
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+@section Head {
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+}
+<div class="library-auth">
+    <aside class="library-auth-intro" aria-labelledby="auth-intro-title">
+        <a class="library-auth-back" asp-controller="Home" asp-action="Index">Về mục lục sách</a>
+        <div>
+            <svg class="library-auth-art" viewBox="0 0 240 160" fill="none" aria-hidden="true" focusable="false">
+                <path d="M30 136h180M43 34h28v101H43zM80 18h22v117H80zM111 43h27v92h-27zM151 31l22-5 25 105-22 5z" stroke="currentColor" stroke-width="1.5" />
+                <path d="M48 49h18M48 116h18M85 34h12M85 116h12M116 58h17M116 116h17M155 48l22-5M171 117l22-5" stroke="currentColor" />
+            </svg>
+            <h2 id="auth-intro-title">Một chỗ cho<br /><em>những trang đang đọc.</em></h2>
+            <p>Theo dõi sách đang mượn, xem hạn trả và giữ thông tin thẻ thư viện trong cùng một tài khoản.</p>
+        </div>
+        <p class="library-auth-help">Chưa có tài khoản hoặc quên mật khẩu? Liên hệ thủ thư tại quầy để được cấp tài khoản hoặc đặt lại mật khẩu.</p>
+    </aside>
+
+    <section class="library-auth-panel" aria-labelledby="page-title">
+        <div class="library-auth-form-wrap">
+            <h1 id="page-title">Đăng nhập</h1>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <p>Bạn đang đăng nhập với tên <strong>@User.Identity.Name</strong>.</p>
+                <a class="library-auth-submit" asp-controller="Home" asp-action="Index">Về trang chủ</a>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button class="library-auth-signout" type="submit">Đăng xuất để dùng tài khoản khác</button>
+                </form>
+            }
+            else
+            {
+                <p class="library-auth-lead">Sử dụng tài khoản thư viện để tiếp tục.</p>
+                @if (!Environment.IsDevelopment())
+                {
+                    <p class="library-auth-notice">Đăng nhập chưa được kết nối với hệ thống tài khoản. Vui lòng liên hệ thủ thư.</p>
+                }
+                <form asp-controller="Account" asp-action="Login" method="post" class="library-auth-form">
+                    <input asp-for="ReturnUrl" type="hidden" />
+                    <div asp-validation-summary="ModelOnly" class="library-auth-errors" role="alert" tabindex="-1"></div>
+                    <div class="library-auth-field">
+                        <label asp-for="Username"></label>
+                        <input asp-for="Username" autocomplete="username" placeholder="Nhập tên đăng nhập hoặc email" maxlength="100" required aria-describedby="username-error" />
+                        <span asp-validation-for="Username" id="username-error" class="library-auth-field-error"></span>
+                    </div>
+                    <div class="library-auth-field">
+                        <label asp-for="Password"></label>
+                        <div class="library-auth-password">
+                            <input asp-for="Password" autocomplete="current-password" placeholder="Nhập mật khẩu" maxlength="128" required aria-describedby="password-error" />
+                            <button type="button" id="toggle-password" aria-controls="Password" aria-pressed="false">Hiện</button>
+                        </div>
+                        <span asp-validation-for="Password" id="password-error" class="library-auth-field-error"></span>
+                    </div>
+                    <label class="library-auth-remember">
+                        <input asp-for="RememberMe" />
+                        <span>@Html.DisplayNameFor(model => model.RememberMe)</span>
+                    </label>
+                    <button type="submit" class="library-auth-submit" disabled="@(!Environment.IsDevelopment())">Đăng nhập</button>
+                </form>
+
+                @if (Environment.IsDevelopment())
+                {
+                    <section class="library-auth-demo" aria-labelledby="demo-title">
+                        <h2 id="demo-title">Tài khoản xem thử</h2>
+                        <p>Chọn một tài khoản để điền tên đăng nhập. Mật khẩu chung: <code>ThuVien@@123</code>.</p>
+                        <div class="library-auth-demo-options">
+                            <button type="button" data-demo-username="reader">Độc giả <span>reader</span></button>
+                            <button type="button" data-demo-username="staff">Nhân viên <span>staff</span></button>
+                            <button type="button" data-demo-username="admin">Quản trị <span>admin</span></button>
+                        </div>
+                        <p class="library-auth-demo-note">Chỉ dùng để xem giao diện trong môi trường phát triển.</p>
+                    </section>
+                }
+            }
+        </div>
+    </section>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/login.js" asp-append-version="true"></script>
+}

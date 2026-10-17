@@ -1,0 +1,45 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Env
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
+
+@{
+    var devServerUrl = Config.GetValue<string>("Vite:ServerUrl", "http://localhost:5173");
+    var isDevServerExplicit = Config.GetValue<bool?>("Vite:DevServer", null);
+    var distJsPath = System.IO.Path.Combine(Env.WebRootPath, "dist", "assets", "main.js");
+    var distIndexCssPath = System.IO.Path.Combine(Env.WebRootPath, "dist", "assets", "index.css");
+    var distCssPath = System.IO.Path.Combine(Env.WebRootPath, "dist", "assets", "main.css");
+    var hasDistBuild = System.IO.File.Exists(distJsPath);
+
+    // Mặc định: Nếu ở Development, ưu tiên Dev Server nếu được bật hoặc nếu chưa build dist.
+    // Nếu đã build dist và không cấu hình bật dev server thì dùng dist.
+    bool useDevServer = Env.IsDevelopment() && (isDevServerExplicit == true || (!hasDistBuild && isDevServerExplicit != false));
+}
+
+@if (useDevServer)
+{
+    @* Vite HMR & React Fast Refresh Script *@
+    <script type="module">
+        import RefreshRuntime from '@devServerUrl/@@react-refresh'
+        RefreshRuntime.injectIntoGlobalHook(window)
+        window.$RefreshReg$ = () => {}
+        window.$RefreshSig$ = () => () => {}
+        window.__vite_plugin_react_preamble_installed__ = true
+    </script>
+    <script type="module" src="@devServerUrl/@@vite/client"></script>
+    <script type="module" src="@devServerUrl/src/main.tsx"></script>
+}
+else
+{
+    @* Production Bundle từ wwwroot/dist *@
+    @if (System.IO.File.Exists(distIndexCssPath))
+    {
+        <link rel="stylesheet" href="~/dist/assets/index.css" asp-append-version="true" />
+    }
+    @if (System.IO.File.Exists(distCssPath))
+    {
+        <link rel="stylesheet" href="~/dist/assets/main.css" asp-append-version="true" />
+    }
+    @if (hasDistBuild)
+    {
+        <script type="module" src="~/dist/assets/main.js" asp-append-version="true"></script>
+    }
+}
