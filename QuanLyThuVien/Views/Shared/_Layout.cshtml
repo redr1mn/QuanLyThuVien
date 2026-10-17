@@ -51,7 +51,7 @@
                         <div class="dropdown">
                             <button class="library-account-button dropdown-toggle" type="button" id="library-account-menu"
                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                @(User.Identity?.Name ?? "Tài khoản")
+                                <span class="library-account-name">@(User.Identity?.Name ?? "Tài khoản")</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="library-account-menu">
                                 <li>
@@ -72,6 +72,10 @@
     </header>
 
     <main id="main-content" class="library-content" tabindex="-1">
+        @if (TempData["AccountStatus"] is string accountStatus)
+        {
+            <div class="library-account-status" role="status">@accountStatus</div>
+        }
         @RenderBody()
     </main>
 

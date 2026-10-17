@@ -103,6 +103,13 @@ body.library-shell {
 .library-content {
     flex: 1 0 auto;
 }
+.library-account-status {
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper-deep);
+    color: var(--stamp);
+    font-size: .875rem;
+}
 
 /* ---------- Focus & skip link ---------- */
 .library-shell a:focus-visible,
@@ -329,6 +336,8 @@ body.library-shell {
 /* Tên người dùng là dữ liệu: giữ nguyên chữ hoa/thường */
 .library-account-button {
     max-width: 100%;
+    justify-content: center;
+    gap: 8px;
     background: transparent;
     color: var(--ink);
 }
@@ -337,12 +346,27 @@ body.library-shell {
     .library-account-button.show {
         background: transparent;
         color: var(--oxblood);
-        text-decoration-line: underline;
+        text-decoration: none;
     }
 
+.library-account-name {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.library-account-button:hover .library-account-name,
+.library-account-button.show .library-account-name {
+    text-decoration: underline;
+    text-underline-offset: .45em;
+    text-decoration-thickness: 1px;
+}
+
     .library-account-button.dropdown-toggle::after {
-        margin-left: auto;
-        padding-left: .75rem;
+        flex: none;
+        margin-left: 0;
+        padding-left: 0;
         border: 0;
         vertical-align: baseline;
         content: "▾";

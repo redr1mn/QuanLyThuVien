@@ -1,14 +1,13 @@
-@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
 @{
-    var preview = Environment.IsDevelopment();
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     var action = ViewContext.RouteData.Values["action"]?.ToString();
     var groups = new[] {
-        (Controller: "Reader", Label: "Độc giả", Visible: preview || User.IsInRole("Reader"),
+        (Controller: "Reader", Label: "Độc giả", Visible: isAuthenticated && User.IsInRole("Reader"),
             Links: new[] { (Action: "Account", Label: "Tài khoản độc giả") }),
-        (Controller: "Staff", Label: "Nghiệp vụ thư viện", Visible: preview || User.IsInRole("Staff") || User.IsInRole("Admin"),
+        (Controller: "Staff", Label: "Nghiệp vụ thư viện", Visible: isAuthenticated && (User.IsInRole("Staff") || User.IsInRole("Admin")),
             Links: new[] { (Action: "Books", Label: "Quản lý sách"), (Action: "Readers", Label: "Quản lý độc giả & Thẻ"), (Action: "Circulation", Label: "Mượn trả sách") }),
-        (Controller: "Admin", Label: "Quản trị", Visible: preview || User.IsInRole("Admin"),
+        (Controller: "Admin", Label: "Quản trị", Visible: isAuthenticated && User.IsInRole("Admin"),
             Links: new[] { (Action: "Reports", Label: "Thống kê & Báo cáo"), (Action: "Users", Label: "Nhân viên & Phân quyền"), (Action: "Settings", Label: "Cấu hình hệ thống") })
     };
 }

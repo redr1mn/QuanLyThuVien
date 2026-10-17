@@ -1,6 +1,6 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
 @{
-    var preview = Environment.IsDevelopment();
+    var preview = Environment.IsDevelopment() && User.Identity?.IsAuthenticated != true;
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
     var links = new[] {
