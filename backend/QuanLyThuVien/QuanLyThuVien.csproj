@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Tránh cho dotnet watcher theo dõi node_modules của ClientApp -->
+    <!-- Tránh cho dotnet watcher theo dõi node_modules của frontend -->
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />

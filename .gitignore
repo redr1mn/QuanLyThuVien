@@ -364,6 +364,6 @@ FodyWeavers.xsd
 
 # Node / Vite Frontend
 **/node_modules/
-**/ClientApp/dist/
+**/frontend/dist/
 **/wwwroot/dist/
 .vite/
