@@ -1,11 +1,27 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using QuanLyThuVien.Application.Common;
+using QuanLyThuVien.Infrastructure.Authentication;
+using QuanLyThuVien.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.Configure<LibraryOptions>(builder.Configuration.GetSection(LibraryOptions.SectionName));
+builder.Services.AddDbContext<LibraryDbContext>((serviceProvider, options) =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var connectionName = configuration
+        .GetSection(LibraryOptions.SectionName)
+        .GetValue<string>(nameof(LibraryOptions.ConnectionStringName)) ?? "LibraryDb";
+    var connectionString = configuration.GetConnectionString(connectionName);
+
+    if (!string.IsNullOrWhiteSpace(connectionString))
+        options.UseSqlServer(connectionString);
+});
+builder.Services.AddLibraryIdentity();
+builder.Services.AddHealthChecks().AddDbContextCheck<LibraryDbContext>("sql-server");
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
