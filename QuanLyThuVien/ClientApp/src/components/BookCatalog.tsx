@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 
-/* ------------------------------------------------------------------ */
-/*  Kiểu dữ liệu                                                       */
-/* ------------------------------------------------------------------ */
 export interface Book {
   id: number;
   title: string;
@@ -19,7 +16,7 @@ export interface Book {
 }
 
 interface BookCatalogProps {
-  /** Dữ liệu từ ASP.NET Core (Razor Model) truyền sang */
+  /** Danh sách null/rỗng hiện dùng dữ liệu mẫu; cần bỏ fallback này khi nối kho sách thật. */
   initialBooks?: Book[];
 }
 
@@ -31,9 +28,7 @@ interface Slip {
   due?: string;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Dữ liệu mẫu (dùng khi không có initialBooks)                        */
-/* ------------------------------------------------------------------ */
+// Dữ liệu phục vụ xem giao diện; số lượng và trạng thái ở đây không đại diện cho kho thật.
 const img = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=600&q=80`;
 
 const MOCK_BOOKS: Book[] = [
@@ -99,17 +94,15 @@ const MOCK_BOOKS: Book[] = [
   },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  Tiện ích                                                           */
-/* ------------------------------------------------------------------ */
 const PAGE_SIZE = 6;
 const pad = (n: number, w = 3) => String(n).padStart(w, '0');
 const formatPrice = (n: number) => `${new Intl.NumberFormat('vi-VN').format(n)} ₫`;
 const formatDate = (d: Date) => d.toLocaleDateString('vi-VN');
+// Tách dấu tổ hợp và xử lý riêng chữ đ để tìm kiếm tiếng Việt không cần gõ dấu.
 const normalize = (s: string) =>
   s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
 
-/* Font + hoạt ảnh. Font Google cần được nạp ở Index.cshtml. */
+// Dùng cùng font token với Razor; Google Fonts được tải một lần trong _Layout.cshtml.
 const STYLES = `
 .bc-root .font-serif{font-family:var(--font-serif)}
 .bc-root .font-mono{font-family:var(--font-mono)}
@@ -119,9 +112,6 @@ const STYLES = `
 @media (prefers-reduced-motion:reduce){.bc-stamp-in{animation:none;opacity:.92;transform:rotate(-6deg)}}
 `;
 
-/* ------------------------------------------------------------------ */
-/*  Thành phần nhỏ                                                     */
-/* ------------------------------------------------------------------ */
 function AvailabilityStamp({ book }: { book: Book }) {
   const inStock = book.availableQuantity > 0;
   return (
@@ -153,12 +143,11 @@ function Cover({ book, lift = false, stamp = false }: { book: Book; lift?: boole
         src={book.coverImage}
         alt={`Bìa sách ${book.title}`}
         loading="lazy"
+        // Ẩn ảnh lỗi để lộ tên sách ở lớp phía dưới, thay vì hiện biểu tượng ảnh hỏng.
         onError={(e) => { e.currentTarget.style.display = 'none'; }}
         className="absolute inset-0 h-full w-full object-cover sepia-[.2] contrast-95"
       />
-      {/* Nếp gáy sách */}
       <span aria-hidden className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/30 to-transparent" />
-      {/* Mép giấy giả lập */}
       <span
         aria-hidden
         className="absolute inset-y-0 right-0 w-1.5 border-l border-[#D2CBB8] bg-[repeating-linear-gradient(180deg,#F4F1EA_0_2px,#D2CBB8_2px_3px)]"
@@ -172,9 +161,6 @@ function Cover({ book, lift = false, stamp = false }: { book: Book; lift?: boole
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Component chính                                                    */
-/* ------------------------------------------------------------------ */
 export default function BookCatalog({ initialBooks }: BookCatalogProps) {
   const [books, setBooks] = useState<Book[]>(() =>
     initialBooks && initialBooks.length > 0 ? initialBooks : MOCK_BOOKS
@@ -187,7 +173,6 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [slips, setSlips] = useState<Record<number, Slip>>({});
 
-  /* ---- Dữ liệu dẫn xuất ---- */
   const categories = useMemo(() => Array.from(new Set(books.map((b) => b.category))), [books]);
 
   const base = useMemo(() => {
@@ -199,12 +184,14 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
     );
   }, [books, query, category]);
 
+  // Tách lọc tồn kho khỏi từ khóa/thể loại để có thể bật/tắt điều kiện còn sách độc lập.
   const filtered = useMemo(
     () => (availability === 'available' ? base.filter((b) => b.availableQuantity > 0) : base),
     [base, availability]
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  // Sau khi dữ liệu thay đổi, không để trang hiện tại vượt quá số trang còn lại.
   const safePage = Math.min(page, totalPages);
   const start = (safePage - 1) * PAGE_SIZE;
   const pageItems = filtered.slice(start, start + PAGE_SIZE);
@@ -216,13 +203,16 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
 
   const selected = books.find((b) => b.id === selectedId) ?? null;
 
-  /* ---- Hành động ---- */
+  // Đổi điều kiện tìm kiếm phải quay về trang đầu để tránh hiển thị danh sách rỗng do phân trang.
   const changeQuery = (v: string) => { setQuery(v); setPage(1); };
   const changeCategory = (v: string) => { setCategory(v); setPage(1); };
   const changeAvailability = (v: Availability) => { setAvailability(v); setPage(1); };
   const resetFilters = () => { setQuery(''); setCategory(''); setAvailability('all'); setPage(1); };
 
+  // Chỉ mô phỏng trong state của tab hiện tại: tải lại sẽ mất phiếu và khôi phục tồn kho mẫu.
+  // TODO: Thay bằng API kiểm tra quyền, thẻ, tồn kho và lưu giao dịch; hạn 14 ngày hiện chỉ là giá trị demo.
   const submitSlip = (book: Book) => {
+    // Mỗi sách chỉ tạo một phiếu trong phiên xem thử để tránh trừ tồn kho nhiều lần do bấm lặp.
     if (slips[book.id]) return;
     const now = new Date();
     const inStock = book.availableQuantity > 0;
@@ -236,7 +226,7 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
     }
   };
 
-  /* ---- Đóng modal bằng Esc, khóa cuộn nền ---- */
+  // Lưu và khôi phục overflow ban đầu để modal không làm trang mất khả năng cuộn khi đóng/unmount.
   useEffect(() => {
     if (selectedId === null) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelectedId(null); };
@@ -249,16 +239,13 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
     };
   }, [selectedId]);
 
-  /* ---- Style dùng chung ---- */
   const ghostBtn =
     'font-sans text-sm border border-[#D2CBB8] px-2.5 py-1 transition-colors hover:bg-[#141413] hover:text-[#F4F1EA] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#8C2D19]';
 
-  /* ================================================================ */
   return (
     <div className="bc-root min-h-screen bg-[#F4F1EA] font-sans text-[#141413] border-t border-[#D2CBB8] lg:grid lg:grid-cols-12">
       <style>{STYLES}</style>
 
-      {/* ============ COLOPHON SIDEBAR ============ */}
       <aside className="border-b border-[#D2CBB8] p-6 font-sans lg:sticky lg:top-0 lg:col-span-3 lg:h-screen lg:overflow-y-auto lg:border-b-0 lg:border-r">
         <h2 className="mt-2 font-serif text-3xl font-medium leading-tight tracking-tight">
           Sổ Cái <span className="italic text-[#5C5954]">Ấn Bản</span>
@@ -337,15 +324,12 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
         </p>
       </aside>
 
-      {/* ============ THE STACKS ============ */}
       <main className="lg:col-span-9">
-        {/* ---- Section 1: Header & Filter ---- */}
         <header className="bc-catalog-header flex flex-col gap-3 border-b border-[#D2CBB8] bg-[#F4F1EA] px-6 py-4 lg:px-8 lg:py-5">
           <h1 className="font-serif text-4xl font-medium leading-tight tracking-tight md:text-5xl">
             Tra Cứu &amp; Chi Tiết Sách Thư Viện
           </h1>
 
-          {/* Phiếu tra cứu */}
           <div>
             <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
               <label htmlFor="bc-search" className="font-sans text-sm font-medium text-[#141413]">
@@ -363,7 +347,6 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
             />
           </div>
 
-          {/* Chế độ xem */}
           <div className="flex flex-col items-start gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="inline-flex max-w-full border border-[#D2CBB8]" role="group" aria-label="Chế độ xem">
               {([
@@ -392,7 +375,6 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
           </div>
         </header>
 
-        {/* ---- Section 2: Kệ sách ---- */}
         {filtered.length === 0 ? (
           <div className="border-b border-[#D2CBB8] p-10 text-center">
             <p className="font-serif text-2xl italic text-[#5C5954]">Ngăn kệ này chưa có ấn bản nào.</p>
@@ -500,7 +482,6 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
           </div>
         )}
 
-        {/* Phân trang */}
         {filtered.length > 0 && (
           <nav
             aria-label="Phân trang"
@@ -543,7 +524,6 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
         )}
       </main>
 
-      {/* ============ Section 3: MODAL "THE FOLIO" ============ */}
       {selected && (() => {
         const slip = slips[selected.id];
         const inStock = selected.availableQuantity > 0;
@@ -559,7 +539,6 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
               aria-labelledby="bc-folio-title"
               className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-none border-2 border-[#141413] bg-[#F4F1EA] text-[#141413] shadow-[12px_12px_0px_#141413] md:grid md:grid-cols-12"
             >
-              {/* Trang trái */}
               <section className="md:col-span-5 md:border-r border-[#D2CBB8]">
                 <div className="bg-[#E8E3D8] p-6">
                   <div className="mx-auto max-w-[220px]"><Cover book={selected} /></div>
@@ -605,7 +584,6 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
                 </div>
               </section>
 
-              {/* Trang phải */}
               <section className="relative flex flex-col p-6 md:col-span-7 md:p-8">
                 <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 hidden w-5 bg-gradient-to-r from-[#141413]/15 to-transparent md:block" />
 

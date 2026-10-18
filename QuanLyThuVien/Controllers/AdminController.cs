@@ -10,6 +10,7 @@ public class AdminController : Controller
 
     public IActionResult Reports(string? tab)
     {
+        // Chuẩn hóa tab từ URL; Dashboard cũ chuyển hướng tới cùng màn hình với tab overview.
         ViewData["ActiveTab"] = tab is "circulation" or "overdue" or "fines" ? tab : "overview";
         return View();
     }

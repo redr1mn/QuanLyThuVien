@@ -1,4 +1,5 @@
 @{
+    ViewData["WorkspacePage"] = "reports";
     ViewData["Title"] = "Thống kê & Báo cáo";
     var activeTab = ViewData["ActiveTab"]?.ToString();
     var tabs = new[] {
@@ -18,6 +19,6 @@
         }
     </nav>
     <div class="library-page-body" data-active-tab="@activeTab">
-        @* TODO: Tổng quan, báo cáo theo kỳ và xuất Excel/PDF. *@
+        <partial name="_WorkspaceApp" />
     </div>
 </section>

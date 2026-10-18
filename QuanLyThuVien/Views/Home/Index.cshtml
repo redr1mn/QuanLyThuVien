@@ -1,10 +1,7 @@
 @*
-    Views/Home/Index.cshtml
-    - Truyền Model từ Controller sang React qua thẻ <script type="application/json">.
-    - Đổi kiểu @model cho khớp với entity trong dự án của bạn (QuanLyThuVien.Models.Book).
-    - Property của Book cần khớp interface Book trong BookCatalog.tsx (tự chuyển camelCase):
-      Id, Title, Author, Category, Publisher, PublishYear, Price, Location,
-      AvailableQuantity, TotalQuantity, CoverImage, Description.
+    Trang chủ được mount riêng bởi src/index.tsx, không qua registry data-react-component.
+    View chuẩn bị JSON trong #book-data nhưng entry hiện chưa đọc nó và vẫn dùng sách mẫu.
+    TODO: Cho entry đọc #book-data rồi truyền initialBooks khi nối dữ liệu từ HomeController.
     - Nếu Model null hoặc rỗng, React tự dùng dữ liệu mẫu.
 *@
 @model IEnumerable<QuanLyThuVien.Models.Book>?
@@ -27,6 +24,6 @@
 <script id="book-data" type="application/json">@Html.Raw(booksJson)</script>
 
 @section Scripts {
-    @* Trỏ tới file bundle của bạn. Ví dụ Vite: ~/dist/assets/index.js ; CRA: ~/static/js/main.js *@
+    @* Entry index.js mount #book-catalog-root; main.js do _ViteScripts nạp chỉ mount các phần tử data-react-component. *@
     <script type="module" src="~/dist/assets/index.js" asp-append-version="true"></script>
 }

@@ -28,6 +28,7 @@ public class AccountController(IWebHostEnvironment environment) : Controller
         if (!ModelState.IsValid)
             return View(model);
 
+        // Chuẩn hóa username demo; không trim/đổi chữ hoa thường của mật khẩu vì đó là dữ liệu xác thực.
         var account = model.Username.Trim().ToLowerInvariant() switch
         {
             "reader" => (Name: "Nguyễn Minh Anh", Role: "Reader"),
@@ -50,6 +51,7 @@ public class AccountController(IWebHostEnvironment environment) : Controller
             new Claim("authentication_source", "demo")
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        // IsPersistent quyết định cookie có sống qua lần đóng trình duyệt; ExpiresUtc giới hạn hiệu lực ticket.
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(identity), new AuthenticationProperties
             {
@@ -58,6 +60,7 @@ public class AccountController(IWebHostEnvironment environment) : Controller
             });
 
         TempData["AccountStatus"] = $"Đã đăng nhập với tên {account.Name}.";
+        // Không dùng Redirect trực tiếp với dữ liệu form để tránh chuyển người dùng sang website bên ngoài.
         return Url.IsLocalUrl(model.ReturnUrl)
             ? LocalRedirect(model.ReturnUrl!)
             : RedirectToAction("Index", "Home");

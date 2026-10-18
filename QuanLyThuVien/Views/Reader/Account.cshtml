@@ -1,4 +1,5 @@
 @{
+    ViewData["WorkspacePage"] = "account";
     ViewData["Title"] = "Tài khoản độc giả";
     var activeTab = ViewData["ActiveTab"]?.ToString();
     var tabs = new[] {
@@ -18,6 +19,6 @@
         }
     </nav>
     <div class="library-page-body" data-active-tab="@activeTab">
-        @* TODO: Nội dung của tab đang chọn; phân quyền trước khi tải dữ liệu cá nhân. *@
+        <partial name="_WorkspaceApp" />
     </div>
 </section>

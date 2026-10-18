@@ -2,18 +2,19 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import BookCatalog from './components/BookCatalog';
+import Workspace from './components/Workspace';
 
-// Danh sách các React components có thể nhúng vào Razor Views
+// Chỉ mount component đã đăng ký; tên lấy từ HTML không được dùng để import mã tùy ý.
 const componentRegistry: Record<string, React.ComponentType<any>> = {
   BookCatalog,
+  Workspace,
 };
 
-// Hàm tự động mount các components theo thuộc tính data-react-component
 function mountAutoComponents() {
   const elements = document.querySelectorAll<HTMLElement>('[data-react-component]');
 
   elements.forEach((el) => {
-    // Tránh mount lặp lại
+    // Giữ lại root đã mount nếu hàm bị gọi lại, tránh tạo nhiều React root trên cùng một phần tử.
     if (el.dataset.reactMounted === 'true') return;
 
     const componentName = el.getAttribute('data-react-component');
@@ -45,14 +46,14 @@ function mountAutoComponents() {
   });
 }
 
-// Khởi chạy khi DOM đã sẵn sàng
+// Script có thể chạy trước hoặc sau DOMContentLoaded, nên cần xử lý cả hai thời điểm.
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', mountAutoComponents);
 } else {
   mountAutoComponents();
 }
 
-// Xuất ra window để có thể gọi thủ công từ script Razor nếu cần
+// Dành cho container được Razor/script thêm sau lần quét ban đầu; bên gọi phải tránh mount lại cùng container.
 declare global {
   interface Window {
     mountReactComponent?: (name: string, containerId: string, props?: any) => void;

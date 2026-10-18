@@ -1,5 +1,6 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
 @{
+    // Guest mở trực tiếp trang khung được xem sidebar trong Development; không áp dụng ngoại lệ này cho dữ liệu/API.
     var preview = Environment.IsDevelopment() && User.Identity?.IsAuthenticated != true;
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();

@@ -1,4 +1,5 @@
 @{
+    // Chỉ lọc mục hiển thị; controller/API vẫn phải tự kiểm tra quyền, không được dựa vào menu này.
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     var action = ViewContext.RouteData.Values["action"]?.ToString();

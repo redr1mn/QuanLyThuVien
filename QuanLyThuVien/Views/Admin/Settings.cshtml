@@ -1,7 +1,8 @@
 @{
+    ViewData["WorkspacePage"] = "settings";
     ViewData["Title"] = "Cấu hình hệ thống";
 }
 <section class="library-page" aria-labelledby="page-title">
     <h1 id="page-title">@ViewData["Title"]</h1>
-    @* TODO: Tham số mượn trả, thời hạn thẻ và mức phạt. *@
+    <partial name="_WorkspaceApp" />
 </section>

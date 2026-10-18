@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -15,7 +14,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.Events.OnValidatePrincipal = async context =>
         {
-            // Phiên xem thử không được dùng khi chuyển sang Production.
+            // Cookie demo có thể còn sau khi đổi môi trường; phải từ chối ở server dù form demo đã bị ẩn.
             if (!builder.Environment.IsDevelopment()
                 && context.Principal?.HasClaim("authentication_source", "demo") == true)
             {
@@ -27,17 +26,17 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    // Chỉ bật HSTS ngoài Development để không buộc trình duyệt ghi nhớ HTTPS cho các cổng thử cục bộ.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
+// Khôi phục ClaimsPrincipal từ cookie trước khi middleware phân quyền và Razor đọc User/role.
 app.UseAuthentication();
 app.UseAuthorization();
 

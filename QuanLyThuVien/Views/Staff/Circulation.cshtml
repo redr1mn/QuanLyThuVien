@@ -1,4 +1,5 @@
 @{
+    ViewData["WorkspacePage"] = "circulation";
     ViewData["Title"] = "Mượn trả sách";
     var activeTab = ViewData["ActiveTab"]?.ToString();
     var tabs = new[] {
@@ -21,6 +22,6 @@
         }
     </nav>
     <div class="library-page-body" data-active-tab="@activeTab">
-        @* TODO: Nội dung tab. Chỉ Staff được lập phiếu mượn và xử lý trả sách; kiểm tra quyền ở backend. *@
+        <partial name="_WorkspaceApp" />
     </div>
 </section>

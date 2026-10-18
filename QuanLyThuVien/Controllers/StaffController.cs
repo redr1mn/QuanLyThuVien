@@ -10,6 +10,7 @@ public class StaffController : Controller
 
     public IActionResult Circulation(string? tab)
     {
+        // Query parameter giữ tab khi tải lại/Back; giá trị không hợp lệ quay về danh sách phiếu.
         ViewData["ActiveTab"] = tab is "borrow" or "return" ? tab : "list";
         return View();
     }

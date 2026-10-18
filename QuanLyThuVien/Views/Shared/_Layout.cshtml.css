@@ -1,1 +1,1 @@
-/* Shared shell styles live in wwwroot/css/site.css: Razor Tag Helpers do not receive CSS isolation attributes. */
+/* Navbar dùng CSS chung trong site.css và library-shell.css (nạp sau để ghi đè); sửa các file đó để đồng bộ layout và partial. */
