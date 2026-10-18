@@ -17,7 +17,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../wwwroot/dist',
+    outDir: '../backend/QuanLyThuVien/wwwroot/dist',
     emptyOutDir: true,
     manifest: true,
     rollupOptions: {
