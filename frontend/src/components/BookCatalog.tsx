@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { catalogApi } from '../features/catalog/api/catalog-api';
 
 export interface Book {
   id: number;
@@ -163,8 +164,10 @@ function Cover({ book, lift = false, stamp = false }: { book: Book; lift?: boole
 
 export default function BookCatalog({ initialBooks }: BookCatalogProps) {
   const [books, setBooks] = useState<Book[]>(() =>
-    initialBooks && initialBooks.length > 0 ? initialBooks : MOCK_BOOKS
+    initialBooks ?? []
   );
+  const [catalogLoading, setCatalogLoading] = useState(!initialBooks?.length);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
   const [availability, setAvailability] = useState<Availability>('all');
@@ -172,6 +175,47 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [slips, setSlips] = useState<Record<number, Slip>>({});
+
+  // The backend catalog is authoritative; the old mock constant is retained only as migration context and is not a fallback.
+  void MOCK_BOOKS;
+
+  useEffect(() => {
+    if (initialBooks?.length) {
+      setBooks(initialBooks);
+      setCatalogLoading(false);
+      return;
+    }
+
+    let active = true;
+    setCatalogLoading(true);
+    catalogApi.list({ page: 1, pageSize: 100 })
+      .then((result) => {
+        if (!active) return;
+        setBooks(result.items.map((book) => ({
+          id: book.id,
+          title: book.title,
+          author: book.author,
+          category: book.categoryName,
+          publisher: book.publisher ?? '',
+          publishYear: book.publishYear ?? 0,
+          price: book.replacementPrice,
+          location: '—',
+          availableQuantity: book.availableCopies,
+          totalQuantity: book.totalCopies,
+          coverImage: book.coverImage ?? '',
+          description: '',
+        })));
+        setCatalogError(null);
+        setCatalogLoading(false);
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setCatalogError(error instanceof Error ? error.message : 'Không thể tải danh mục sách.');
+        setCatalogLoading(false);
+      });
+
+    return () => { active = false; };
+  }, [initialBooks]);
 
   const categories = useMemo(() => Array.from(new Set(books.map((b) => b.category))), [books]);
 
@@ -245,6 +289,8 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
   return (
     <div className="bc-root min-h-screen bg-[#F4F1EA] font-sans text-[#141413] border-t border-[#D2CBB8] lg:grid lg:grid-cols-12">
       <style>{STYLES}</style>
+      {catalogLoading && <p className="col-span-full p-6" role="status">Đang tải danh mục sách…</p>}
+      {catalogError && <p className="col-span-full p-6 text-[#8C2D19]" role="alert">{catalogError}</p>}
 
       <aside className="border-b border-[#D2CBB8] p-6 font-sans lg:sticky lg:top-0 lg:col-span-3 lg:h-screen lg:overflow-y-auto lg:border-b-0 lg:border-r">
         <h2 className="mt-2 font-serif text-3xl font-medium leading-tight tracking-tight">

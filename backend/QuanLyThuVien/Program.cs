@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using QuanLyThuVien.Application.Common;
 using QuanLyThuVien.Application.Features.Auth;
+using QuanLyThuVien.Application.Features.Catalog;
 using QuanLyThuVien.Api.Middleware;
 using QuanLyThuVien.Infrastructure.Authentication;
 using QuanLyThuVien.Infrastructure.Persistence;
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<LibraryDbContext>((serviceProvider, options) =>
 builder.Services.AddLibraryIdentity();
 builder.Services.AddHealthChecks().AddDbContextCheck<LibraryDbContext>("sql-server");
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<CatalogService>();
 
 var app = builder.Build();
 

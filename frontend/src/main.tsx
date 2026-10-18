@@ -3,11 +3,13 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import BookCatalog from './components/BookCatalog';
 import Workspace from './components/Workspace';
+import CatalogPage from './features/catalog/pages/CatalogPage';
 
 // Chỉ mount component đã đăng ký; tên lấy từ HTML không được dùng để import mã tùy ý.
 const componentRegistry: Record<string, React.ComponentType<any>> = {
   BookCatalog,
   Workspace,
+  CatalogPage,
 };
 
 function mountAutoComponents() {
