@@ -17,7 +17,11 @@ public sealed class LoansController(CirculationService circulationService, Libra
     [HttpGet]
     public async Task<ActionResult<ApiEnvelope<PagedResult<LoanListItem>>>> List([FromQuery] string? status, [FromQuery] int? memberId, [FromQuery] bool overdueOnly, [FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        if (!User.IsInRole("Staff") && !User.IsInRole("Admin")) memberId = await dbContext.Users.Where(user => user.Id == User.FindFirstValue(ClaimTypes.NameIdentifier)).Select(user => user.MemberId).SingleOrDefaultAsync(cancellationToken);
+        if (!User.IsInRole("Staff") && !User.IsInRole("Admin"))
+        {
+            memberId = await dbContext.Users.Where(user => user.Id == User.FindFirstValue(ClaimTypes.NameIdentifier)).Select(user => user.MemberId).SingleOrDefaultAsync(cancellationToken);
+            if (!memberId.HasValue) return Forbid();
+        }
         return Ok(ApiEnvelope<PagedResult<LoanListItem>>.Success(await circulationService.ListAsync(memberId, status, overdueOnly, page, pageSize, cancellationToken)));
     }
 

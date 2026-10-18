@@ -37,7 +37,9 @@ public sealed class AuthService(
         });
 
         var roles = await userManager.GetRolesAsync(user);
-        var role = roles.FirstOrDefault() ?? "Reader";
+        var role = roles.FirstOrDefault();
+        if (role is null)
+            return AuthResult.Invalid("Tài khoản chưa được cấp vai trò.");
         var displayName = user.Member?.FullName ?? user.UserName ?? user.Email ?? user.Id;
         return AuthResult.Success(new AuthSession(user.Id, displayName, role));
     }
