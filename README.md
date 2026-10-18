@@ -93,7 +93,7 @@ Nếu bạn không muốn chạy đồng thời 2 terminal hoặc muốn kiểm 
 
 2. **Chạy ASP.NET Core:**
    ```bash
-   dotnet run
+   dotnet run --project backend/QuanLyThuVien/QuanLyThuVien.csproj
    ```
    *Hệ thống sẽ tự động nhận diện file bundle tĩnh trong `backend/QuanLyThuVien/wwwroot/dist` và phục vụ mà không cần bật server Vite.*
 
