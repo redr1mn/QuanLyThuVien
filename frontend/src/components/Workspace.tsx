@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { addDays, addMonths, available, borrow, dateLabel, defaults, money, newId, overdueDays, returnLoan, seed, today, type BookRecord, type Employee, type Reader, type Store } from './workspace-data';
 import './workspace.css';
+import MembersPage from '../features/members/pages/MembersPage';
 
 type Props = { page: 'books' | 'readers' | 'circulation' | 'account' | 'reports' | 'users' | 'settings'; tab?: string; role?: string; baseUrl?: string };
 type Editor = { kind: 'book' | 'reader' | 'user'; id?: string } | null;
@@ -179,6 +180,7 @@ export default function Workspace({ page, tab = '', role = '', baseUrl = '/' }: 
   const book = s.books.find(b => b.id === editor?.id);
   const reader = s.readers.find(r => r.id === editor?.id);
   const user = s.users.find(u => u.id === editor?.id);
+  if (page === 'readers') return <MembersPage />;
   return <div className="ws-root">
     <div className="ws-demo-note"><span className="library-record">Bản thực hành</span><span>Dữ liệu minh họa lưu trên trình duyệt này, chưa kết nối cơ sở dữ liệu.{page === 'account' ? ' Đang xem hồ sơ mẫu Nguyễn Minh Anh (DG001).' : ''}</span></div>
     <div role="status" aria-live="polite" className={notice ? 'ws-notice' : 'ws-status-empty'}>{notice}</div>
