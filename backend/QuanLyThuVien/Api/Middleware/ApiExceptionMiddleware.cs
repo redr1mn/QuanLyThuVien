@@ -4,6 +4,7 @@ using System.Text.Json;
 using QuanLyThuVien.Api.Contracts;
 using QuanLyThuVien.Application.Features.Members;
 using QuanLyThuVien.Application.Features.Circulation;
+using QuanLyThuVien.Application.Features.Reservations;
 
 namespace QuanLyThuVien.Api.Middleware;
 
@@ -20,6 +21,10 @@ public sealed class ApiExceptionMiddleware(RequestDelegate next, ILogger<ApiExce
             await WriteErrorAsync(context, HttpStatusCode.BadRequest, "validation_error", exception.Message);
         }
         catch (ForbiddenException exception)
+        {
+            await WriteErrorAsync(context, HttpStatusCode.Forbidden, "forbidden", exception.Message);
+        }
+        catch (ReservationForbiddenException exception)
         {
             await WriteErrorAsync(context, HttpStatusCode.Forbidden, "forbidden", exception.Message);
         }

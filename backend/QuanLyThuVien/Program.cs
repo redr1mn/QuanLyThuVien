@@ -4,6 +4,8 @@ using QuanLyThuVien.Application.Features.Auth;
 using QuanLyThuVien.Application.Features.Catalog;
 using QuanLyThuVien.Application.Features.Members;
 using QuanLyThuVien.Application.Features.Circulation;
+using QuanLyThuVien.Application.Features.Reservations;
+using QuanLyThuVien.Application.Features.Reports;
 using QuanLyThuVien.Api.Middleware;
 using QuanLyThuVien.Infrastructure.Authentication;
 using QuanLyThuVien.Infrastructure.Persistence;
@@ -32,6 +34,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<CatalogService>();
 builder.Services.AddScoped<MemberService>();
 builder.Services.AddScoped<CirculationService>();
+builder.Services.AddScoped<ReservationService>();
+builder.Services.AddScoped<ReportService>();
 builder.Services.AddSingleton<IClock, SystemClock>();
 
 var app = builder.Build();
