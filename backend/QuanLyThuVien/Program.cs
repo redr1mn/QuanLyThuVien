@@ -3,10 +3,12 @@ using QuanLyThuVien.Application.Common;
 using QuanLyThuVien.Application.Features.Auth;
 using QuanLyThuVien.Application.Features.Catalog;
 using QuanLyThuVien.Application.Features.Members;
+using QuanLyThuVien.Application.Features.Circulation;
 using QuanLyThuVien.Api.Middleware;
 using QuanLyThuVien.Infrastructure.Authentication;
 using QuanLyThuVien.Infrastructure.Persistence;
 using QuanLyThuVien.Infrastructure.Persistence.Seed;
+using QuanLyThuVien.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Development.local.json", optional: true, reloadOnChange: false);
@@ -29,6 +31,8 @@ builder.Services.AddHealthChecks().AddDbContextCheck<LibraryDbContext>("sql-serv
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<CatalogService>();
 builder.Services.AddScoped<MemberService>();
+builder.Services.AddScoped<CirculationService>();
+builder.Services.AddSingleton<IClock, SystemClock>();
 
 var app = builder.Build();
 

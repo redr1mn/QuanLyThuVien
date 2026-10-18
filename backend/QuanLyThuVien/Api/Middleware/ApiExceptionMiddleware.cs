@@ -3,6 +3,7 @@ using System.Net;
 using System.Text.Json;
 using QuanLyThuVien.Api.Contracts;
 using QuanLyThuVien.Application.Features.Members;
+using QuanLyThuVien.Application.Features.Circulation;
 
 namespace QuanLyThuVien.Api.Middleware;
 
@@ -21,6 +22,10 @@ public sealed class ApiExceptionMiddleware(RequestDelegate next, ILogger<ApiExce
         catch (ForbiddenException exception)
         {
             await WriteErrorAsync(context, HttpStatusCode.Forbidden, "forbidden", exception.Message);
+        }
+        catch (ConflictException exception)
+        {
+            await WriteErrorAsync(context, HttpStatusCode.Conflict, "conflict", exception.Message);
         }
         catch (KeyNotFoundException exception)
         {
