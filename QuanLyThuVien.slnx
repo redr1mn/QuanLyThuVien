@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="backend/QuanLyThuVien/QuanLyThuVien.csproj" />
+  <Project Path="backend/QuanLyThuVien.Tests/QuanLyThuVien.Tests.csproj" />
 </Solution>

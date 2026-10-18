@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using QuanLyThuVien.Application.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<LibraryOptions>(builder.Configuration.GetSection(LibraryOptions.SectionName));
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -41,6 +43,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",
@@ -49,3 +52,5 @@ app.MapControllerRoute(
 
 
 app.Run();
+
+public partial class Program { }
