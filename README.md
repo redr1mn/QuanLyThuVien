@@ -1,5 +1,7 @@
 # 📚 Hệ Thống Quản Lý Thư Viện (QuanLyThuVien)
 
+> **Trạng thái hiện tại:** Nhánh triển khai native đã chuyển xác thực và nghiệp vụ chính sang ASP.NET Core Identity + SQL Server. Các mô tả "demo/tài khoản mẫu" cũ bên dưới là lịch sử UI và không còn là nguồn xác thực/dữ liệu nghiệp vụ. Xem [docs/sql-server-local.md](docs/sql-server-local.md) để setup hiện tại.
+
 Dự án Web Quản Lý Thư Viện được xây dựng theo mô hình kiến trúc **Hybrid Web Application**: kết hợp nền tảng **ASP.NET Core 10.0 MVC** (Backend, Routing, Razor Views) với **React 18 + TypeScript + Vite + Tailwind CSS v4** (Interactive UI Widgets).
 
 ---
@@ -9,7 +11,7 @@ Dự án Web Quản Lý Thư Viện được xây dựng theo mô hình kiến t
 - **Kết hợp linh hoạt**: Giữ nguyên toàn bộ cấu trúc định tuyến, Controller, Razor Views và Authentication của ASP.NET Core MVC, đồng thời nhúng các React Components tương tác cao vào bất kỳ trang `.cshtml` nào.
 - **Hot Module Replacement (HMR)**: Sử dụng Vite Dev Server cho phép cập nhật tức thì giao diện React và CSS khi code mà không cần tải lại toàn bộ trang.
 - **Tự động Mount**: Chỉ cần gắn thuộc tính `data-react-component="TênComponent"` và `data-props='{...}'` vào bất kỳ thẻ HTML nào, component sẽ tự khởi tạo.
-- **Bundle frontend**: `_ViteScripts.cshtml` chuyển sang bundle tĩnh trong `backend/QuanLyThuVien/wwwroot/dist/` khi chạy Production hoặc khi tắt Vite Dev Server. Phần xác thực hiện dùng tài khoản mẫu trong Development, chưa kết nối cơ sở dữ liệu.
+- **Bundle frontend**: `_ViteScripts.cshtml` chuyển sang bundle tĩnh trong `backend/QuanLyThuVien/wwwroot/dist/` khi chạy Production hoặc khi tắt Vite Dev Server. Frontend gọi API bằng Axios, validate response bằng Zod và quản lý server state bằng Zustand.
 - **Tự động hóa đóng gói**: Khi chạy `dotnet publish`, dự án tự động kích hoạt `npm install` và `npm run build` để đóng gói frontend.
 
 ---
@@ -115,7 +117,7 @@ Nếu bạn không muốn chạy đồng thời 2 terminal hoặc muốn kiểm 
 - Cả POST đăng nhập và đăng xuất đều kiểm tra antiforgery token.
 - Khi truy cập lại trang đăng nhập trong một phiên hợp lệ, trang hiển thị tài khoản hiện tại và nút đăng xuất để đổi tài khoản.
 
-### Tài khoản mẫu — chỉ dùng trong Development
+### Tài khoản phát triển — chỉ dùng trong Development
 
 | Tên đăng nhập | Tên hiển thị trên navbar | Vai trò |
 | :--- | :--- | :--- |
@@ -123,11 +125,7 @@ Nếu bạn không muốn chạy đồng thời 2 terminal hoặc muốn kiểm 
 | `staff` | Trần Thu Hà | `Staff` |
 | `admin` | Lê Hoàng Nam | `Admin` |
 
-**Mật khẩu chung:** `ThuVien@123`.
-
-Các tài khoản được khai báo trực tiếp trong `backend/QuanLyThuVien/Controllers/AccountController.cs`, ở action POST `Login`; chưa lưu trong database. Dù nhãn ô nhập có ghi email, bản demo hiện chỉ xác thực ba tên đăng nhập trên.
-
-Ngoài Development, giao diện không hiển thị các nút tài khoản mẫu, nút gửi form bị vô hiệu hóa và backend từ chối đăng nhập demo. Cookie có claim `authentication_source=demo` cũng bị từ chối nếu dùng ngoài Development.
+Mật khẩu seed được đọc từ biến môi trường `Library__DevelopmentSeedPassword` và không được ghi vào source control. Các tài khoản được lưu bằng ASP.NET Core Identity trong SQL Server; xem [docs/sql-server-local.md](docs/sql-server-local.md) để seed local.
 
 ### Navbar theo trạng thái đăng nhập
 
@@ -170,23 +168,23 @@ Nếu thay đổi controller hoặc cấu hình xác thực nhưng ứng dụng 
 
 ### Backend còn cần triển khai
 
-- [ ] Thiết kế dữ liệu tài khoản/vai trò; liên kết tài khoản với hồ sơ độc giả và nhân viên.
-- [ ] Thay tài khoản mẫu bằng dịch vụ xác thực hoặc ASP.NET Core Identity; hỗ trợ đăng nhập bằng username/email thật.
-- [ ] Lưu và kiểm tra mật khẩu bằng password hash; bỏ mật khẩu demo viết trực tiếp trong controller.
-- [ ] Kiểm tra trạng thái tài khoản bị khóa/ngừng hoạt động.
-- [ ] Thêm `[Authorize]`, role/policy cho controller, action và API; kiểm tra quyền và phạm vi dữ liệu ở backend.
+- [x] Thiết kế dữ liệu tài khoản/vai trò; liên kết tài khoản với hồ sơ độc giả và nhân viên.
+- [x] Dùng ASP.NET Core Identity với đăng nhập bằng username/email thật.
+- [x] Lưu và kiểm tra mật khẩu bằng password hash; seed local chỉ nhận password qua environment.
+- [x] Kiểm tra trạng thái tài khoản bị khóa/ngừng hoạt động.
+- [x] Thêm `[Authorize]`, role/policy cho controller, action và API; kiểm tra quyền và phạm vi dữ liệu ở backend.
 - [ ] Giữ quyền lập phiếu mượn và xử lý trả sách cho Staff theo đặc tả; không tự cấp cho Admin chỉ vì có menu quản lý.
 - [ ] Triển khai cấp tài khoản, đổi mật khẩu, quên/đặt lại mật khẩu; hiện chỉ có hướng dẫn liên hệ thủ thư.
 - [ ] Giới hạn số lần thử đăng nhập, khóa tạm thời và ghi nhật ký phù hợp.
 - [ ] Thu hồi phiên khi tài khoản bị khóa, đổi mật khẩu hoặc thay đổi quyền.
-- [ ] Lấy thẻ, sách đang mượn, lịch sử và tiền phạt theo ID người dùng hiện tại.
+- [ ] Lấy thêm thẻ, lịch sử và tiền phạt cho màn hình tài khoản độc giả đầy đủ.
 - [ ] Cấu hình cookie `Secure` qua HTTPS và lưu/chia sẻ khóa Data Protection phù hợp khi triển khai máy chủ.
 
 ### Frontend còn cần triển khai
 
-- [ ] Kết nối catalog, tài khoản độc giả, mượn trả, báo cáo và các màn hình quản lý với API backend thật.
-- [ ] Đồng bộ kiểu dữ liệu dùng chung giữa frontend và backend bằng một contract rõ ràng.
-- [ ] Bổ sung trạng thái loading, lỗi, rỗng và không đủ quyền cho các màn hình dùng dữ liệu server.
+- [x] Kết nối catalog, quản lý độc giả, mượn trả, báo cáo và các màn hình nghiệp vụ chính với API backend thật.
+- [x] Đồng bộ kiểu dữ liệu frontend/backend bằng các contract và Zod schemas.
+- [x] Bổ sung trạng thái loading, lỗi, rỗng và không đủ quyền cho các màn hình dùng dữ liệu server.
 - [ ] Bổ sung lint/typecheck độc lập và kiểm thử end-to-end trên trình duyệt.
 
 Các mục backend và frontend ở trên đều là công việc tiếp theo; việc tách thư mục chỉ thay đổi ranh giới mã nguồn, chưa triển khai các năng lực này.

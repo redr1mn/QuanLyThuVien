@@ -34,6 +34,7 @@
             {
                 <p class="library-auth-lead">Sử dụng tài khoản thư viện để tiếp tục.</p>
                 <form asp-controller="Account" asp-action="Login" method="post" class="library-auth-form">
+                    @Html.AntiForgeryToken()
                     <input asp-for="ReturnUrl" type="hidden" />
                     <div asp-validation-summary="ModelOnly" class="library-auth-errors" role="alert" tabindex="-1"></div>
                     <div class="library-auth-field">

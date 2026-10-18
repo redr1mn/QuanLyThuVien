@@ -1,8 +1,6 @@
 @*
-    Trang chủ được mount riêng bởi src/index.tsx, không qua registry data-react-component.
-    View chuẩn bị JSON trong #book-data nhưng entry hiện chưa đọc nó và vẫn dùng sách mẫu.
-    TODO: Cho entry đọc #book-data rồi truyền initialBooks khi nối dữ liệu từ HomeController.
-    - Nếu Model null hoặc rỗng, React tự dùng dữ liệu mẫu.
+    Trang chủ được mount riêng bởi src/index.tsx và catalog gọi API /api/books.
+    JSON legacy bên dưới được giữ để không phá layout Razor cũ; không phải nguồn dữ liệu chính.
 *@
 @model IEnumerable<QuanLyThuVien.Models.Book>?
 

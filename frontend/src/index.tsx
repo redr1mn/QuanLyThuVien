@@ -6,7 +6,7 @@ import './index.css';
 const container = document.getElementById('book-catalog-root');
 
 if (container) {
-  // TODO: Đọc JSON từ #book-data để dùng Model Razor; hiện chưa truyền props nên catalog dùng MOCK_BOOKS.
+  // Trang catalog lấy dữ liệu từ API; JSON Razor legacy không còn là nguồn dữ liệu chính.
   createRoot(container).render(
     <StrictMode>
       <BookCatalog />

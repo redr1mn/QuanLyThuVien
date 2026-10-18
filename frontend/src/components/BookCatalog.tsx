@@ -29,72 +29,6 @@ interface Slip {
   due?: string;
 }
 
-// Dữ liệu phục vụ xem giao diện; số lượng và trạng thái ở đây không đại diện cho kho thật.
-const img = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=600&q=80`;
-
-const MOCK_BOOKS: Book[] = [
-  {
-    id: 1, title: 'Truyện Kiều', author: 'Nguyễn Du', category: 'Văn học kinh điển',
-    publisher: 'NXB Văn Học', publishYear: 2019, price: 128000, location: 'KỆ A2 · TẦNG 3',
-    availableQuantity: 4, totalQuantity: 6, coverImage: img('1544947950-fa07a98d237f'),
-    description: 'Kiệt tác thơ Nôm lục bát gồm 3.254 câu, kể về mười lăm năm chìm nổi của nàng Kiều. Bản in này đối chiếu nhiều dị bản và có chú giải điển cố ở lề.',
-  },
-  {
-    id: 2, title: 'Việt Nam Sử Lược', author: 'Trần Trọng Kim', category: 'Lịch sử',
-    publisher: 'NXB Văn Hóa Thông Tin', publishYear: 2017, price: 165000, location: 'KỆ B1 · TẦNG 2',
-    availableQuantity: 0, totalQuantity: 3, coverImage: img('1481627834876-b7833e8f5570'),
-    description: 'Bộ thông sử viết bằng chữ Quốc ngữ đầu tiên, đi từ thời Hồng Bàng đến đầu thế kỷ XX. Các bản in đều đang được luân chuyển nên cần ghi danh chờ.',
-  },
-  {
-    id: 3, title: 'Dế Mèn Phiêu Lưu Ký', author: 'Tô Hoài', category: 'Văn học kinh điển',
-    publisher: 'NXB Kim Đồng', publishYear: 2020, price: 78000, location: 'KỆ A3 · TẦNG 1',
-    availableQuantity: 7, totalQuantity: 8, coverImage: img('1512820790803-83ca734da794'),
-    description: 'Cuộc phiêu lưu của chú dế trẻ kiêu ngạo đi qua bờ ruộng, ngõ cỏ và học bài học đầu tiên về tình bạn. Trang sách thơm mùi đồng nội.',
-  },
-  {
-    id: 4, title: 'Suy Tưởng', author: 'Marcus Aurelius', category: 'Triết học',
-    publisher: 'NXB Thế Giới', publishYear: 2018, price: 112000, location: 'KỆ C1 · TẦNG 4',
-    availableQuantity: 2, totalQuantity: 4, coverImage: img('1495446815901-a7297e633e8d'),
-    description: 'Những ghi chép riêng của vị hoàng đế - triết gia Khắc kỷ viết giữa các chiến dịch biên cương. Mỗi đoạn ngắn là một lời nhắc về sự điềm tĩnh.',
-  },
-  {
-    id: 5, title: 'Đạo Đức Kinh', author: 'Lão Tử', category: 'Triết học',
-    publisher: 'NXB Văn Học', publishYear: 2016, price: 95000, location: 'KỆ C2 · TẦNG 2',
-    availableQuantity: 3, totalQuantity: 5, coverImage: img('1507842217343-583bb7270b66'),
-    description: 'Tám mươi mốt chương cô đọng nền tảng của Đạo gia. Bản dịch giữ nhịp điệu của nguyên tác, kèm lời bình ở chân trang.',
-  },
-  {
-    id: 6, title: 'Lược Sử Thời Gian', author: 'Stephen Hawking', category: 'Khoa học',
-    publisher: 'NXB Trẻ', publishYear: 2021, price: 142000, location: 'KỆ D1 · TẦNG 3',
-    availableQuantity: 0, totalQuantity: 4, coverImage: img('1524995997946-a1c2e315a42f'),
-    description: 'Hành trình đi từ Vụ Nổ Lớn đến hố đen, được kể bằng ngôn ngữ phổ thông. Cả bốn bản đang cho mượn, danh sách chờ mở sẵn.',
-  },
-  {
-    id: 7, title: 'Nguồn Gốc Các Loài', author: 'Charles Darwin', category: 'Khoa học',
-    publisher: 'NXB Tri Thức', publishYear: 2015, price: 189000, location: 'KỆ D2 · TẦNG 1',
-    availableQuantity: 1, totalQuantity: 2, coverImage: img('1516979187457-637abb4f9353'),
-    description: 'Tác phẩm đặt nền móng cho thuyết tiến hóa bằng chọn lọc tự nhiên, với các minh họa chim sẻ, bồ câu và san hô.',
-  },
-  {
-    id: 8, title: 'Kiến Trúc Nhiệt Đới Việt Nam', author: 'Lê Minh Quân', category: 'Kiến trúc & Thiết kế',
-    publisher: 'NXB Xây Dựng', publishYear: 2022, price: 245000, location: 'KỆ E1 · TẦNG 2',
-    availableQuantity: 3, totalQuantity: 3, coverImage: img('1532012197267-da84d127e765'),
-    description: 'Khảo cứu cách mái hiên, giếng trời và lớp vỏ thông gió làm nên một nền kiến trúc thích ứng với khí hậu nóng ẩm. (Dữ liệu mẫu)',
-  },
-  {
-    id: 9, title: 'Lưới Và Khoảng Trắng', author: 'Đặng Tuấn Kiệt', category: 'Kiến trúc & Thiết kế',
-    publisher: 'NXB Mỹ Thuật', publishYear: 2023, price: 210000, location: 'KỆ E3 · TẦNG 4',
-    availableQuantity: 2, totalQuantity: 3, coverImage: img('1519682337058-a94d519337bc'),
-    description: 'Nhập môn trình bày theo Phong cách Thụy Sĩ: lưới cột, chữ không chân và khoảng trắng như một thành phần của bố cục. (Dữ liệu mẫu)',
-  },
-  {
-    id: 10, title: 'Sử Ký Tư Mã Thiên', author: 'Tư Mã Thiên', category: 'Lịch sử',
-    publisher: 'NXB Văn Học', publishYear: 2014, price: 220000, location: 'KỆ B3 · TẦNG 5',
-    availableQuantity: 1, totalQuantity: 2, coverImage: img('1457369804613-52c61a468e7d'),
-    description: 'Bộ sử đồ sộ ghi chép hơn hai nghìn năm lịch sử Trung Hoa qua các thiên bản kỷ, thế gia và liệt truyện.',
-  },
-];
-
 const PAGE_SIZE = 6;
 const pad = (n: number, w = 3) => String(n).padStart(w, '0');
 const formatPrice = (n: number) => `${new Intl.NumberFormat('vi-VN').format(n)} ₫`;
@@ -174,10 +108,7 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [slips, setSlips] = useState<Record<number, Slip>>({});
-
-  // The backend catalog is authoritative; the old mock constant is retained only as migration context and is not a fallback.
-  void MOCK_BOOKS;
+  const slips: Record<number, Slip> = {};
 
   useEffect(() => {
     if (initialBooks?.length) {
@@ -252,23 +183,6 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
   const changeCategory = (v: string) => { setCategory(v); setPage(1); };
   const changeAvailability = (v: Availability) => { setAvailability(v); setPage(1); };
   const resetFilters = () => { setQuery(''); setCategory(''); setAvailability('all'); setPage(1); };
-
-  // Chỉ mô phỏng trong state của tab hiện tại: tải lại sẽ mất phiếu và khôi phục tồn kho mẫu.
-  // TODO: Thay bằng API kiểm tra quyền, thẻ, tồn kho và lưu giao dịch; hạn 14 ngày hiện chỉ là giá trị demo.
-  const submitSlip = (book: Book) => {
-    // Mỗi sách chỉ tạo một phiếu trong phiên xem thử để tránh trừ tồn kho nhiều lần do bấm lặp.
-    if (slips[book.id]) return;
-    const now = new Date();
-    const inStock = book.availableQuantity > 0;
-    const due = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-    setSlips((s) => ({
-      ...s,
-      [book.id]: { kind: inStock ? 'borrow' : 'reserve', date: formatDate(now), due: inStock ? formatDate(due) : undefined },
-    }));
-    if (inStock) {
-      setBooks((bs) => bs.map((b) => (b.id === book.id ? { ...b, availableQuantity: b.availableQuantity - 1 } : b)));
-    }
-  };
 
   // Lưu và khôi phục overflow ban đầu để modal không làm trang mất khả năng cuộn khi đóng/unmount.
   useEffect(() => {
@@ -676,7 +590,7 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
                   ) : inStock ? (
                     <button
                       type="button"
-                      onClick={() => submitSlip(selected)}
+                      onClick={() => { window.location.href = '/Account/Login?returnUrl=%2F'; }}
                       className="w-full bg-[#141413] px-6 py-3.5 font-sans text-sm text-[#F4F1EA] transition-colors hover:bg-[#1E3A5F] sm:w-auto"
                     >
                       Đăng ký mượn ấn bản
@@ -684,7 +598,7 @@ export default function BookCatalog({ initialBooks }: BookCatalogProps) {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => submitSlip(selected)}
+                      onClick={() => { window.location.href = '/Account/Login?returnUrl=%2F'; }}
                       className="w-full bg-[#8C2D19] px-6 py-3.5 font-sans text-sm text-[#F4F1EA] transition-colors hover:bg-[#6e2212] sm:w-auto"
                     >
                       Ghi danh đặt trước (chờ luân chuyển)
