@@ -1,5 +1,4 @@
 @model LoginViewModel
-@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
 @{
     ViewData["Title"] = "Đăng nhập";
 }
@@ -34,10 +33,6 @@
             else
             {
                 <p class="library-auth-lead">Sử dụng tài khoản thư viện để tiếp tục.</p>
-                @if (!Environment.IsDevelopment())
-                {
-                    <p class="library-auth-notice">Đăng nhập chưa được kết nối với hệ thống tài khoản. Vui lòng liên hệ thủ thư.</p>
-                }
                 <form asp-controller="Account" asp-action="Login" method="post" class="library-auth-form">
                     <input asp-for="ReturnUrl" type="hidden" />
                     <div asp-validation-summary="ModelOnly" class="library-auth-errors" role="alert" tabindex="-1"></div>
@@ -58,22 +53,8 @@
                         <input asp-for="RememberMe" />
                         <span>@Html.DisplayNameFor(model => model.RememberMe)</span>
                     </label>
-                    <button type="submit" class="library-auth-submit" disabled="@(!Environment.IsDevelopment())">Đăng nhập</button>
+                    <button type="submit" class="library-auth-submit">Đăng nhập</button>
                 </form>
-
-                @if (Environment.IsDevelopment())
-                {
-                    <section class="library-auth-demo" aria-labelledby="demo-title">
-                        <h2 id="demo-title">Tài khoản xem thử</h2>
-                        <p>Chọn một tài khoản để điền tên đăng nhập. Mật khẩu chung: <code>ThuVien@@123</code>.</p>
-                        <div class="library-auth-demo-options">
-                            <button type="button" data-demo-username="reader">Độc giả <span>reader</span></button>
-                            <button type="button" data-demo-username="staff">Nhân viên <span>staff</span></button>
-                            <button type="button" data-demo-username="admin">Quản trị <span>admin</span></button>
-                        </div>
-                        <p class="library-auth-demo-note">Chỉ dùng để xem giao diện trong môi trường phát triển.</p>
-                    </section>
-                }
             }
         </div>
     </section>

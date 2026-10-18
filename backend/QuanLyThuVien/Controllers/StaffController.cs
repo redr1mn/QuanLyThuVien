@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace QuanLyThuVien.Controllers;
 
 // Chỉ trả về trang khung. TODO: Phân quyền backend trước khi thêm dữ liệu/nghiệp vụ.
+[Authorize(Roles = "Staff,Admin")]
 public class StaffController : Controller
 {
     public IActionResult Books() => View();

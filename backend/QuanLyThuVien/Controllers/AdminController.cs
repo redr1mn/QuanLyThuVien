@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace QuanLyThuVien.Controllers;
 
 // Chỉ trả về trang khung. TODO: Thêm Authorize(Roles = "Admin") trước khi thêm dữ liệu/nghiệp vụ.
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
     public IActionResult Users() => View();

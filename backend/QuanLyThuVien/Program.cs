@@ -1,11 +1,13 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using QuanLyThuVien.Application.Common;
+using QuanLyThuVien.Application.Features.Auth;
+using QuanLyThuVien.Api.Middleware;
 using QuanLyThuVien.Infrastructure.Authentication;
 using QuanLyThuVien.Infrastructure.Persistence;
+using QuanLyThuVien.Infrastructure.Persistence.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile("appsettings.Development.local.json", optional: true, reloadOnChange: false);
 
 builder.Services.AddControllersWithViews();
 builder.Services.Configure<LibraryOptions>(builder.Configuration.GetSection(LibraryOptions.SectionName));
@@ -22,25 +24,7 @@ builder.Services.AddDbContext<LibraryDbContext>((serviceProvider, options) =>
 });
 builder.Services.AddLibraryIdentity();
 builder.Services.AddHealthChecks().AddDbContextCheck<LibraryDbContext>("sql-server");
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.Cookie.Name = "QuanLyThuVien.Session";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.ExpireTimeSpan = TimeSpan.FromHours(8);
-        options.Events.OnValidatePrincipal = async context =>
-        {
-            // Cookie demo có thể còn sau khi đổi môi trường; phải từ chối ở server dù form demo đã bị ẩn.
-            if (!builder.Environment.IsDevelopment()
-                && context.Principal?.HasClaim("authentication_source", "demo") == true)
-            {
-                context.RejectPrincipal();
-                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            }
-        };
-    });
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
@@ -53,6 +37,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseMiddleware<ApiExceptionMiddleware>();
 
 // Khôi phục ClaimsPrincipal từ cookie trước khi middleware phân quyền và Razor đọc User/role.
 app.UseAuthentication();
@@ -65,6 +50,12 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+if (app.Configuration.GetValue<bool>("Library:SeedDevelopmentUsers"))
+{
+    using var scope = app.Services.CreateScope();
+    await DatabaseSeeder.SeedDevelopmentUsersAsync(scope.ServiceProvider, app.Configuration);
+}
 
 
 app.Run();

@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace QuanLyThuVien.Controllers;
 
 // Chỉ trả về trang khung, chưa tải dữ liệu độc giả.
 // TODO: Đã có cookie xác thực; thêm Authorize(Roles = "Reader") trước khi trả dữ liệu cá nhân.
+[Authorize(Roles = "Reader")]
 public class ReaderController : Controller
 {
     public IActionResult Account(string? tab)
