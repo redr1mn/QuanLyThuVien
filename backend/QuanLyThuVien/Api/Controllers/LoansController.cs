@@ -32,4 +32,13 @@ public sealed class LoansController(CirculationService circulationService, Libra
     [HttpPost("{id:long}/return")]
     [Authorize(Roles = "Staff,Admin")]
     public async Task<ActionResult<ApiEnvelope<LoanListItem>>> Return(long id, ReturnCommand command, CancellationToken cancellationToken) => Ok(ApiEnvelope<LoanListItem>.Success(await circulationService.ReturnAsync(id, command, cancellationToken)));
+
+    [HttpPost("{id:long}/renew")]
+    public async Task<ActionResult<ApiEnvelope<LoanListItem>>> Renew(long id, CancellationToken cancellationToken)
+    {
+        var isStaff = User.IsInRole("Staff") || User.IsInRole("Admin");
+        var memberId = isStaff ? null : await dbContext.Users.Where(user => user.Id == User.FindFirstValue(ClaimTypes.NameIdentifier)).Select(user => user.MemberId).SingleOrDefaultAsync(cancellationToken);
+        if (!isStaff && !memberId.HasValue) return Forbid();
+        return Ok(ApiEnvelope<LoanListItem>.Success(await circulationService.RenewAsync(id, memberId, isStaff, cancellationToken)));
+    }
 }

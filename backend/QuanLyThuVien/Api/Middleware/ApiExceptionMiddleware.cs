@@ -32,6 +32,10 @@ public sealed class ApiExceptionMiddleware(RequestDelegate next, ILogger<ApiExce
         {
             await WriteErrorAsync(context, HttpStatusCode.Conflict, "conflict", exception.Message);
         }
+        catch (CirculationForbiddenException exception)
+        {
+            await WriteErrorAsync(context, HttpStatusCode.Forbidden, "forbidden", exception.Message);
+        }
         catch (KeyNotFoundException exception)
         {
             await WriteErrorAsync(context, HttpStatusCode.NotFound, "not_found", exception.Message);

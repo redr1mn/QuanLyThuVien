@@ -17,7 +17,7 @@ namespace QuanLyThuVien.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -432,6 +432,9 @@ namespace QuanLyThuVien.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ProcessedByUserId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("RenewalCount")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("ReturnedAtUtc")
                         .HasColumnType("datetimeoffset");
