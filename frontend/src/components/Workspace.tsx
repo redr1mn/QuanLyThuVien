@@ -4,6 +4,7 @@ import './workspace.css';
 import MembersPage from '../features/members/pages/MembersPage';
 import CirculationPage from '../features/circulation/pages/CirculationPage';
 import ReportsPage from '../features/reports/pages/ReportsPage';
+import ReaderAccountPage from '../features/reader-account/pages/ReaderAccountPage';
 
 type Props = { page: 'books' | 'readers' | 'circulation' | 'account' | 'reports' | 'users' | 'settings'; tab?: string; role?: string; baseUrl?: string };
 type Editor = { kind: 'book' | 'reader' | 'user'; id?: string } | null;
@@ -185,8 +186,9 @@ export default function Workspace({ page, tab = '', role = '', baseUrl = '/' }: 
   if (page === 'readers') return <MembersPage />;
   if (page === 'circulation') return <CirculationPage />;
   if (page === 'reports') return <ReportsPage />;
+  if (page === 'account') return <ReaderAccountPage />;
   return <div className="ws-root">
-    <div className="ws-demo-note"><span className="library-record">Bản thực hành</span><span>Dữ liệu minh họa lưu trên trình duyệt này, chưa kết nối cơ sở dữ liệu.{page === 'account' ? ' Đang xem hồ sơ mẫu Nguyễn Minh Anh (DG001).' : ''}</span></div>
+    <div className="ws-demo-note"><span className="library-record">Bản thực hành</span><span>Dữ liệu minh họa chỉ còn dùng cho các màn hình legacy chưa chuyển API.</span></div>
     <div role="status" aria-live="polite" className={notice ? 'ws-notice' : 'ws-status-empty'}>{notice}</div>
     {ready ? body : <p role="status">Đang mở sổ dữ liệu…</p>}
     <dialog className="ws-dialog" ref={dialog} onCancel={() => { setEditor(null); setConfirmation(null); }} aria-labelledby="ws-dialog-title">

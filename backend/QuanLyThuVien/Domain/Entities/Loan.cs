@@ -11,6 +11,7 @@ public sealed class Loan
     public DateTimeOffset DueAtUtc { get; set; }
     public DateTimeOffset? ReturnedAtUtc { get; set; }
     public LoanStatus Status { get; set; } = LoanStatus.Open;
+    public int RenewalCount { get; set; }
 
     public Member Member { get; set; } = null!;
     public ApplicationUser? ProcessedByUser { get; set; }

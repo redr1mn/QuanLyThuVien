@@ -10,6 +10,7 @@ using QuanLyThuVien.Infrastructure.Persistence;
 
 namespace QuanLyThuVien.Application.Features.Circulation;
 
+public sealed class CirculationForbiddenException(string message) : Exception(message);
 public sealed class ConflictException(string message) : Exception(message);
 
 public sealed class CirculationService(LibraryDbContext dbContext, IClock clock, IOptions<LibraryOptions> options)
@@ -54,6 +55,19 @@ public sealed class CirculationService(LibraryDbContext dbContext, IClock clock,
         return ToListItem(loan, loan.Member.FullName, loan.Fines.Sum(fine => fine.Amount));
     }
 
+    public async Task<LoanListItem> RenewAsync(long id, int? memberId, bool isStaff, CancellationToken cancellationToken)
+    {
+        await using var transaction = await BeginTransactionAsync(cancellationToken);
+        var loan = await dbContext.Loans.Include(item => item.Member).Include(item => item.Items).ThenInclude(item => item.BookCopy).Include(item => item.Fines).SingleOrDefaultAsync(item => item.Id == id, cancellationToken) ?? throw new KeyNotFoundException("Không tìm thấy phiếu mượn.");
+        if (!isStaff && loan.MemberId != memberId) throw new CirculationForbiddenException("Bạn không được gia hạn phiếu mượn của độc giả khác.");
+        if (loan.Status != LoanStatus.Open || loan.RenewalCount >= 1 || loan.DueAtUtc < clock.UtcNow) throw new ConflictException("Phiếu mượn không đủ điều kiện gia hạn.");
+        var bookIds = await dbContext.LoanItems.Where(item => item.LoanId == loan.Id).Select(item => item.BookCopy.BookId).ToArrayAsync(cancellationToken);
+        if (await dbContext.Reservations.AnyAsync(item => bookIds.Contains(item.BookId) && item.Status == ReservationStatus.Waiting && item.MemberId != loan.MemberId, cancellationToken)) throw new ConflictException("Sách đã có độc giả khác đặt trước.");
+        loan.DueAtUtc = loan.DueAtUtc.AddDays(7); loan.RenewalCount++;
+        await dbContext.SaveChangesAsync(cancellationToken); await CommitAsync(transaction, cancellationToken);
+        return ToListItem(loan, loan.Member.FullName, loan.Fines.Sum(fine => fine.Amount));
+    }
+
     public async Task<PagedResult<LoanListItem>> ListAsync(int? memberId, string? status, bool overdueOnly, int page, int pageSize, CancellationToken cancellationToken)
     {
         page = Math.Max(1, page); pageSize = Math.Clamp(pageSize, 1, 100);
@@ -66,7 +80,7 @@ public sealed class CirculationService(LibraryDbContext dbContext, IClock clock,
         return new PagedResult<LoanListItem>(loans.Select(loan => ToListItem(loan, loan.Member.FullName, loan.Fines.Sum(fine => fine.Amount))).ToArray(), page, pageSize, total);
     }
 
-    private static LoanListItem ToListItem(Loan loan, string memberName, decimal fineTotal) => new(loan.Id, loan.MemberId, memberName, loan.BorrowedAtUtc, loan.DueAtUtc, loan.Status.ToString(), loan.Items.Select(item => item.BookCopyId).ToArray(), fineTotal);
+    private static LoanListItem ToListItem(Loan loan, string memberName, decimal fineTotal) => new(loan.Id, loan.MemberId, memberName, loan.BorrowedAtUtc, loan.DueAtUtc, loan.Status.ToString(), loan.Items.Select(item => item.BookCopyId).ToArray(), fineTotal, loan.RenewalCount);
     private Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken) => dbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory" ? Task.FromResult<IDbContextTransaction>(new NoopTransaction()) : dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
     private static Task CommitAsync(IDbContextTransaction transaction, CancellationToken cancellationToken) => transaction.CommitAsync(cancellationToken);
 
