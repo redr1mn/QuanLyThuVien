@@ -1,5 +1,7 @@
 # 📚 Hệ Thống Quản Lý Thư Viện (QuanLyThuVien)
 
+> **Trạng thái hiện tại:** Nhánh triển khai native đã chuyển xác thực và nghiệp vụ chính sang ASP.NET Core Identity + SQL Server. Các mô tả "demo/tài khoản mẫu" cũ bên dưới là lịch sử UI và không còn là nguồn xác thực/dữ liệu nghiệp vụ. Xem [docs/sql-server-local.md](docs/sql-server-local.md) để setup hiện tại.
+
 Dự án Web Quản Lý Thư Viện được xây dựng theo mô hình kiến trúc **Hybrid Web Application**: kết hợp nền tảng **ASP.NET Core 10.0 MVC** (Backend, Routing, Razor Views) với **React 18 + TypeScript + Vite + Tailwind CSS v4** (Interactive UI Widgets).
 
 ---
@@ -9,7 +11,7 @@ Dự án Web Quản Lý Thư Viện được xây dựng theo mô hình kiến t
 - **Kết hợp linh hoạt**: Giữ nguyên toàn bộ cấu trúc định tuyến, Controller, Razor Views và Authentication của ASP.NET Core MVC, đồng thời nhúng các React Components tương tác cao vào bất kỳ trang `.cshtml` nào.
 - **Hot Module Replacement (HMR)**: Sử dụng Vite Dev Server cho phép cập nhật tức thì giao diện React và CSS khi code mà không cần tải lại toàn bộ trang.
 - **Tự động Mount**: Chỉ cần gắn thuộc tính `data-react-component="TênComponent"` và `data-props='{...}'` vào bất kỳ thẻ HTML nào, component sẽ tự khởi tạo.
-- **Bundle frontend**: `_ViteScripts.cshtml` chuyển sang bundle tĩnh trong `wwwroot/dist/` khi chạy Production hoặc khi tắt Vite Dev Server. Phần xác thực hiện dùng tài khoản mẫu trong Development, chưa kết nối cơ sở dữ liệu.
+- **Bundle frontend**: `_ViteScripts.cshtml` chuyển sang bundle tĩnh trong `backend/QuanLyThuVien/wwwroot/dist/` khi chạy Production hoặc khi tắt Vite Dev Server. Frontend gọi API bằng Axios, validate response bằng Zod và quản lý server state bằng Zustand.
 - **Tự động hóa đóng gói**: Khi chạy `dotnet publish`, dự án tự động kích hoạt `npm install` và `npm run build` để đóng gói frontend.
 
 ---
@@ -36,11 +38,11 @@ cd QuanLyThuVien
 ```
 
 ### Bước 2: Cài đặt thư viện Frontend (React / Vite)
-Di chuyển vào thư mục `ClientApp` và chạy `npm install`:
+Di chuyển vào thư mục `frontend` và chạy `npm install`:
 ```bash
-cd QuanLyThuVien/ClientApp
+cd frontend
 npm install
-cd ../..
+cd ..
 ```
 
 ### Bước 3: Khôi phục và build Backend .NET
@@ -62,14 +64,14 @@ Mở **2 cửa sổ Terminal**:
 
 - **Terminal 1: Khởi chạy Vite Dev Server**
   ```bash
-  cd QuanLyThuVien/ClientApp
+  cd frontend
   npm run dev
   ```
   > Vite Dev Server sẽ chạy tại địa chỉ: `http://localhost:5173`
 
 - **Terminal 2: Khởi chạy ASP.NET Core Web**
   ```bash
-  cd QuanLyThuVien
+  cd backend/QuanLyThuVien
   dotnet run --launch-profile https
   ```
   *(Hoặc mở file `QuanLyThuVien.slnx` bằng Visual Studio và bấm **F5** hoặc **Ctrl + F5**).*
@@ -85,17 +87,17 @@ Nếu bạn không muốn chạy đồng thời 2 terminal hoặc muốn kiểm 
 
 1. **Build mã nguồn React thành file bundle tĩnh:**
    ```bash
-   cd QuanLyThuVien/ClientApp
+   cd frontend
    npm run build
    cd ..
    ```
-   *Vite biên dịch TypeScript và tạo các entry `main.js`, `index.js`, CSS và các chunk dùng chung trong `wwwroot/dist/assets/`.*
+   *Vite biên dịch TypeScript và tạo các entry `main.js`, `index.js`, CSS và các chunk dùng chung trong `backend/QuanLyThuVien/wwwroot/dist/assets/`.*
 
 2. **Chạy ASP.NET Core:**
    ```bash
-   dotnet run
+   dotnet run --project backend/QuanLyThuVien/QuanLyThuVien.csproj
    ```
-   *Hệ thống sẽ tự động nhận diện file bundle tĩnh trong `wwwroot/dist` và phục vụ mà không cần bật server Vite.*
+   *Hệ thống sẽ tự động nhận diện file bundle tĩnh trong `backend/QuanLyThuVien/wwwroot/dist` và phục vụ mà không cần bật server Vite.*
 
 > **Cấu hình hiện tại**: `Vite:DevServer` đang là `true` trong `appsettings.Development.json`. Để dùng bundle tĩnh mà không chạy Vite, đổi giá trị này thành `false`, rồi khởi động lại ứng dụng. Chạy bằng bundle tĩnh trong Development vẫn dùng được tài khoản mẫu; đây không phải môi trường Production.
 
@@ -115,7 +117,7 @@ Nếu bạn không muốn chạy đồng thời 2 terminal hoặc muốn kiểm 
 - Cả POST đăng nhập và đăng xuất đều kiểm tra antiforgery token.
 - Khi truy cập lại trang đăng nhập trong một phiên hợp lệ, trang hiển thị tài khoản hiện tại và nút đăng xuất để đổi tài khoản.
 
-### Tài khoản mẫu — chỉ dùng trong Development
+### Tài khoản phát triển — chỉ dùng trong Development
 
 | Tên đăng nhập | Tên hiển thị trên navbar | Vai trò |
 | :--- | :--- | :--- |
@@ -123,11 +125,7 @@ Nếu bạn không muốn chạy đồng thời 2 terminal hoặc muốn kiểm 
 | `staff` | Trần Thu Hà | `Staff` |
 | `admin` | Lê Hoàng Nam | `Admin` |
 
-**Mật khẩu chung:** `ThuVien@123`.
-
-Các tài khoản được khai báo trực tiếp trong `QuanLyThuVien/Controllers/AccountController.cs`, ở action POST `Login`; chưa lưu trong database. Dù nhãn ô nhập có ghi email, bản demo hiện chỉ xác thực ba tên đăng nhập trên.
-
-Ngoài Development, giao diện không hiển thị các nút tài khoản mẫu, nút gửi form bị vô hiệu hóa và backend từ chối đăng nhập demo. Cookie có claim `authentication_source=demo` cũng bị từ chối nếu dùng ngoài Development.
+Mật khẩu seed được đọc từ biến môi trường `Library__DevelopmentSeedPassword` và không được ghi vào source control. Các tài khoản được lưu bằng ASP.NET Core Identity trong SQL Server; xem [docs/sql-server-local.md](docs/sql-server-local.md) để seed local.
 
 ### Navbar theo trạng thái đăng nhập
 
@@ -154,7 +152,7 @@ Nếu thay đổi controller hoặc cấu hình xác thực nhưng ứng dụng 
 
 ### File phụ trách
 
-| File trong `QuanLyThuVien/` | Nội dung |
+| File trong `backend/QuanLyThuVien/` | Nội dung |
 | :--- | :--- |
 | `Controllers/AccountController.cs` | GET/POST đăng nhập, tài khoản mẫu, tạo claim, đăng xuất |
 | `Models/LoginViewModel.cs` | Dữ liệu form và validation |
@@ -170,17 +168,26 @@ Nếu thay đổi controller hoặc cấu hình xác thực nhưng ứng dụng 
 
 ### Backend còn cần triển khai
 
-- [ ] Thiết kế dữ liệu tài khoản/vai trò; liên kết tài khoản với hồ sơ độc giả và nhân viên.
-- [ ] Thay tài khoản mẫu bằng dịch vụ xác thực hoặc ASP.NET Core Identity; hỗ trợ đăng nhập bằng username/email thật.
-- [ ] Lưu và kiểm tra mật khẩu bằng password hash; bỏ mật khẩu demo viết trực tiếp trong controller.
-- [ ] Kiểm tra trạng thái tài khoản bị khóa/ngừng hoạt động.
-- [ ] Thêm `[Authorize]`, role/policy cho controller, action và API; kiểm tra quyền và phạm vi dữ liệu ở backend.
+- [x] Thiết kế dữ liệu tài khoản/vai trò; liên kết tài khoản với hồ sơ độc giả và nhân viên.
+- [x] Dùng ASP.NET Core Identity với đăng nhập bằng username/email thật.
+- [x] Lưu và kiểm tra mật khẩu bằng password hash; seed local chỉ nhận password qua environment.
+- [x] Kiểm tra trạng thái tài khoản bị khóa/ngừng hoạt động.
+- [x] Thêm `[Authorize]`, role/policy cho controller, action và API; kiểm tra quyền và phạm vi dữ liệu ở backend.
 - [ ] Giữ quyền lập phiếu mượn và xử lý trả sách cho Staff theo đặc tả; không tự cấp cho Admin chỉ vì có menu quản lý.
 - [ ] Triển khai cấp tài khoản, đổi mật khẩu, quên/đặt lại mật khẩu; hiện chỉ có hướng dẫn liên hệ thủ thư.
 - [ ] Giới hạn số lần thử đăng nhập, khóa tạm thời và ghi nhật ký phù hợp.
 - [ ] Thu hồi phiên khi tài khoản bị khóa, đổi mật khẩu hoặc thay đổi quyền.
-- [ ] Lấy thẻ, sách đang mượn, lịch sử và tiền phạt theo ID người dùng hiện tại.
+- [ ] Lấy thêm thẻ, lịch sử và tiền phạt cho màn hình tài khoản độc giả đầy đủ.
 - [ ] Cấu hình cookie `Secure` qua HTTPS và lưu/chia sẻ khóa Data Protection phù hợp khi triển khai máy chủ.
+
+### Frontend còn cần triển khai
+
+- [x] Kết nối catalog, quản lý độc giả, mượn trả, báo cáo và các màn hình nghiệp vụ chính với API backend thật.
+- [x] Đồng bộ kiểu dữ liệu frontend/backend bằng các contract và Zod schemas.
+- [x] Bổ sung trạng thái loading, lỗi, rỗng và không đủ quyền cho các màn hình dùng dữ liệu server.
+- [ ] Bổ sung lint/typecheck độc lập và kiểm thử end-to-end trên trình duyệt.
+
+Các mục backend và frontend ở trên đều là công việc tiếp theo; việc tách thư mục chỉ thay đổi ranh giới mã nguồn, chưa triển khai các năng lực này.
 
 ---
 
@@ -213,14 +220,14 @@ Các màn hình gộp dùng query parameter `tab` để tải lại và dùng Ba
 | Dữ liệu lưu trữ | IBM Plex Mono (`font-mono`), `tabular-nums`, uppercase, tracking rộng, cỡ 12px |
 | Menu, nút, form và mô tả | Inter (`font-sans`) |
 
-Font được tải chung trong `_Layout.cshtml`. CSS của Razor và theme Tailwind trong `ClientApp/src/index.css` dùng cùng hệ chữ.
+Font được tải chung trong `_Layout.cshtml`. CSS của Razor và theme Tailwind trong `frontend/src/index.css` dùng cùng hệ chữ.
 
 ---
 
 ## 🧩 3. Hướng dẫn Phát triển Component React mới
 
 ### Bước 1: Tạo Component mới
-Tạo một file `.tsx` trong thư mục `QuanLyThuVien/ClientApp/src/components/`, ví dụ `UserCard.tsx`:
+Tạo một file `.tsx` trong thư mục `frontend/src/components/`, ví dụ `UserCard.tsx`:
 
 ```tsx
 import React from 'react';
@@ -249,7 +256,7 @@ export default UserCard;
 ```
 
 ### Bước 2: Đăng ký Component vào Registry
-Mở file `QuanLyThuVien/ClientApp/src/main.tsx` và thêm component vào `componentRegistry`:
+Mở file `frontend/src/main.tsx` và thêm component vào `componentRegistry`:
 
 ```tsx
 import BookCatalog from './components/BookCatalog';
@@ -312,49 +319,47 @@ Razor sẽ encode JSON trong thuộc tính HTML; không dùng `Html.Raw` cho d�
 
 ```
 QuanLyThuVien/
+├── backend/
+│   └── QuanLyThuVien/               # ASP.NET MVC, Razor và server assets
+│       ├── Controllers/             # C# MVC Controllers (HomeController,...)
+│       ├── Models/                  # Các C# ViewModels / Entities
+│       ├── Views/                   # Razor Views (.cshtml)
+│       │   ├── Home/
+│       │   │   └── Index.cshtml     # Trang chủ tra cứu sách bằng React
+│       │   ├── Account/Login.cshtml # Form đăng nhập và tài khoản xem thử
+│       │   ├── Reader/Account.cshtml # Trang khung tài khoản độc giả
+│       │   ├── Staff/               # Trang khung sách, độc giả, mượn trả
+│       │   ├── Admin/               # Trang khung báo cáo, nhân viên, cấu hình
+│       │   └── Shared/
+│       │       ├── _Layout.cshtml   # Layout chính tích hợp _ViteScripts
+│       │       ├── _LayoutAdmin.cshtml # Layout quản lý có sidebar
+│       │       ├── _PrimaryNavigation.cshtml # Navbar theo vai trò
+│       │       ├── _WorkspaceNavigation.cshtml # Sidebar quản lý
+│       │       └── _ViteScripts.cshtml # Script loader Dev HMR / Prod Bundle
+│       ├── Properties/
+│       │   └── launchSettings.json  # Cấu hình URL và cổng chạy khi Debug
+│       ├── wwwroot/                 # Tài nguyên tĩnh phục vụ web
+│       │   ├── dist/                # Bundle do Vite sinh ra khi build
+│       │   ├── css/
+│       │   ├── js/
+│       │   └── lib/
+│       ├── appsettings.json         # Cấu hình hệ thống
+│       ├── appsettings.Development.json # Cấu hình Vite Dev Server URL & Mode
+│       ├── Program.cs               # Điểm khởi chạy của ứng dụng ASP.NET Core
+│       └── QuanLyThuVien.csproj     # File cấu hình .NET & script tự build Vite
+├── frontend/                        # React, TypeScript, Vite và frontend tests
+│   ├── src/
+│   │   ├── components/              # Các React Components
+│   │   │   └── BookCatalog.tsx      # Tra cứu, danh mục và modal chi tiết sách
+│   │   ├── index.css                # Tailwind CSS v4 & Global CSS
+│   │   ├── main.tsx                 # Registry & Auto-mount logic cho React
+│   │   └── index.tsx                # Mount BookCatalog ở trang chủ
+│   ├── tests/                       # Frontend tests
+│   ├── package.json                 # Cấu hình dependencies npm
+│   ├── tsconfig.json                # Cấu hình TypeScript
+│   └── vite.config.ts               # Cấu hình Vite build sang backend/wwwroot/dist
 ├── QuanLyThuVien.slnx               # Solution file của giải pháp .NET
-├── README.md                        # Tài liệu hướng dẫn dự án
-└── QuanLyThuVien/                   # Thư mục chính của dự án web
-    ├── Controllers/                 # C# MVC Controllers (HomeController,...)
-    ├── Models/                      # Các C# ViewModels / Entities
-    ├── Views/                       # Razor Views (.cshtml)
-    │   ├── Home/
-    │   │   └── Index.cshtml         # Trang chủ tra cứu sách bằng React
-    │   ├── Account/Login.cshtml     # Form đăng nhập và tài khoản xem thử
-    │   ├── Reader/Account.cshtml    # Trang khung tài khoản độc giả
-    │   ├── Staff/                  # Trang khung sách, độc giả, mượn trả
-    │   ├── Admin/                  # Trang khung báo cáo, nhân viên, cấu hình
-    │   └── Shared/
-    │       ├── _Layout.cshtml       # Layout chính tích hợp _ViteScripts
-    │       ├── _LayoutAdmin.cshtml  # Layout quản lý có sidebar
-    │       ├── _PrimaryNavigation.cshtml # Navbar theo vai trò
-    │       ├── _WorkspaceNavigation.cshtml # Sidebar quản lý
-    │       └── _ViteScripts.cshtml  # Script loader thông minh (Dev HMR / Prod Bundle)
-    ├── ClientApp/                   # Mã nguồn Frontend React (Vite + TypeScript)
-    │   ├── src/
-    │   │   ├── components/          # Thư mục chứa các React Components
-    │   │   │   └── BookCatalog.tsx  # Tra cứu, danh mục và modal chi tiết sách
-    │   │   ├── index.css            # Tailwind CSS v4 & Global CSS
-    │   │   ├── main.tsx             # Registry & Auto-mount logic cho React
-    │   │   └── index.tsx            # Mount BookCatalog ở trang chủ
-    │   ├── package.json             # Cấu hình dependencies npm
-    │   ├── tsconfig.json            # Cấu hình TypeScript
-    │   └── vite.config.ts           # Cấu hình Vite build & output sang wwwroot/dist
-    ├── Properties/
-    │   └── launchSettings.json      # Cấu hình URL và cổng chạy khi Debug
-    ├── wwwroot/                     # Tài nguyên tĩnh phục vụ web
-    │   ├── dist/                    # Bundle thành phẩm do Vite sinh ra khi build
-    │   │   ├── assets/
-    │   │   │   ├── main.js
-    │   │   │   ├── index.js
-    │   │   │   └── index.css
-    │   │   └── .vite/manifest.json
-    │   ├── css/
-    │   └── js/
-    ├── appsettings.json             # Cấu hình hệ thống
-    ├── appsettings.Development.json # Cấu hình Vite Dev Server URL & Mode
-    ├── Program.cs                   # Điểm khởi chạy của ứng dụng ASP.NET Core
-    └── QuanLyThuVien.csproj         # File cấu hình dự án .NET & script tự build Vite
+└── README.md                        # Tài liệu hướng dẫn dự án
 ```
 
 ---
@@ -368,8 +373,8 @@ dotnet publish -c Release -o ./publish
 ```
 
 Hệ thống sẽ tự động:
-1. Chạy `npm install` trong thư mục `ClientApp`.
-2. Chạy `npm run build` để sinh ra file bundle tối ưu vào `wwwroot/dist`.
+1. Chạy `npm install` trong thư mục `frontend`.
+2. Chạy `npm run build` để sinh ra file bundle tối ưu vào `backend/QuanLyThuVien/wwwroot/dist`.
 3. Đóng gói toàn bộ ứng dụng ASP.NET Core cùng các file tĩnh vào thư mục `./publish`.
 
 ---
@@ -381,8 +386,8 @@ Hệ thống sẽ tự động:
   dotnet dev-certs https --trust
   ```
 - **React Component không hiển thị hoặc báo spinner loading liên tục:**
-  - Hãy kiểm tra xem bạn đã chạy `npm run dev` trong thư mục `ClientApp` chưa (nếu ở chế độ Development).
+  - Hãy kiểm tra xem bạn đã chạy `npm run dev` trong thư mục `frontend` chưa (nếu ở chế độ Development).
   - Hoặc chạy `npm run build` để sinh bundle tĩnh.
   - Kiểm tra Console trình duyệt (F12) xem có báo lỗi thiếu component trong registry của `main.tsx` không.
 - **Port 5173 bị chiếm dụng:**
-  - Nếu port 5173 bị chương trình khác sử dụng, bạn có thể thay đổi port trong file `ClientApp/vite.config.ts` và cập nhật tương ứng tại `QuanLyThuVien/appsettings.Development.json`.
+  - Nếu port 5173 bị chương trình khác sử dụng, bạn có thể thay đổi port trong file `frontend/vite.config.ts` và cập nhật tương ứng tại `backend/QuanLyThuVien/appsettings.Development.json`.
