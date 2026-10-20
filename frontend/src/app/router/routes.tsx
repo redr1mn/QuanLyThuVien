@@ -1,5 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CatalogPage from '../../features/catalog/pages/CatalogPage';
+import LoginPage from '../../pages/auth/LoginPage';
+import RegisterPage from '../../pages/auth/RegisterPage';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
 import PublicLayout from '../layouts/PublicLayout';
 
@@ -12,8 +14,8 @@ export function AppRoutes() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route index element={<CatalogPage />} />
-        <Route path="login" element={<PlaceholderPage title="Đăng nhập" />} />
-        <Route path="register" element={<PlaceholderPage title="Đăng ký" />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
       </Route>
       <Route element={<AuthenticatedLayout />}>
         <Route path="reader/account" element={<PlaceholderPage title="Tài khoản độc giả" />} />
