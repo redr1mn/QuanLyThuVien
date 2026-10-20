@@ -48,3 +48,20 @@ React + Axios
 ```
 
 Circulation rechecks selected copies in a serializable transaction. Loan and fine history are stored in SQL Server; frontend state is only a server projection and never the authority.
+
+## URL khi chạy Development
+
+Đây là ứng dụng hybrid: `5173` chỉ là Vite asset/HMR server, không phải trang web độc lập. Vì project không có `frontend/index.html`, mở trực tiếp `http://localhost:5173/` sẽ trả `404` và đó là bình thường.
+
+Sau khi chạy cả Vite và ASP.NET Core, mở một trong các URL của backend:
+
+```text
+https://localhost:7244
+http://localhost:5194
+```
+
+HTTP có thể tự redirect sang HTTPS. Nếu trình duyệt cảnh báo chứng chỉ local, chạy:
+
+```powershell
+dotnet dev-certs https --trust
+```
