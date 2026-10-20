@@ -4,13 +4,22 @@ Backend dùng SQL Server qua Entity Framework Core. Không commit mật khẩu, 
 
 ## Connection string
 
+Runtime của ASP.NET Core đọc biến `ConnectionStrings__LibraryDb`.
+
 PowerShell:
 
 ```powershell
 $env:ConnectionStrings__LibraryDb = 'Server=.;Database=QuanLyThuVien;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True'
 ```
 
-Sau đó chạy migration từ thư mục backend:
+Khi chạy lệnh EF Core ở design-time, `DesignTimeDbContextFactory` yêu cầu biến
+`LIBRARY_DB_CONNECTION`. Có thể gán cùng một giá trị:
+
+```powershell
+$env:LIBRARY_DB_CONNECTION = $env:ConnectionStrings__LibraryDb
+```
+
+Sau đó chạy migration từ thư mục `backend`:
 
 ```powershell
 dotnet ef database update --project QuanLyThuVien/QuanLyThuVien.csproj --startup-project QuanLyThuVien/QuanLyThuVien.csproj
