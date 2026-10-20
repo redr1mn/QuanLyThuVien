@@ -31,28 +31,6 @@ public class AuthAuthorizationTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    [Fact]
-    public async Task Reader_cannot_open_staff_page()
-    {
-        using var app = CreateApp("Reader");
-
-        using var response = await app.Client.GetAsync("/Staff/Books");
-
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-    }
-
-    [Theory]
-    [InlineData("Staff")]
-    [InlineData("Admin")]
-    public async Task Staff_and_admin_can_open_staff_page(string role)
-    {
-        using var app = CreateApp(role);
-
-        using var response = await app.Client.GetAsync("/Staff/Books");
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
-
     private static TestApp CreateApp(string? role = null)
     {
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>

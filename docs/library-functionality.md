@@ -20,12 +20,12 @@ Tài liệu này mô tả chức năng hiện có trong source code. Những ph�
 ## 2. Kiến trúc và luồng dữ liệu
 
 ```text
-React/Vite
+React SPA/Vite (`frontend`)
   ├─ Axios: gọi HTTP API
   ├─ Zod: kiểm tra dữ liệu response/request ở frontend
   └─ Zustand: lưu state theo feature
         ↓ cookie session
-ASP.NET Core MVC/Razor + API Controllers
+ASP.NET Core API (`backend`)
         ↓
 Application Services + Domain Rules
         ↓ EF Core
@@ -60,21 +60,16 @@ Các API protected kiểm tra role ở backend. Việc ẩn menu ở frontend ch
 | Route | Mục đích | Trạng thái hiện tại |
 |---|---|---|
 | `/` | Catalog công khai, tìm kiếm và lọc sách | Đã nối Catalog API |
-| `/Account/Login` | Đăng nhập cookie session | Đã có Identity và anti-forgery |
-| `/Reader/Account?tab=profile` | Hồ sơ và tổng quan tài khoản độc giả | Đã nối API |
-| `/Reader/Account?tab=loans` | Khoản đang mượn và gia hạn | Đã nối API |
-| `/Reader/Account?tab=history` | Lịch sử mượn trả | Đã nối API |
-| `/Reader/Account?tab=reservations` | Danh sách/huỷ đặt trước | Đã có API; giao diện còn theo workspace |
-| `/Staff/Books` | Quản lý sách và bản sao | Có route và API; UI quản trị sách còn cần hoàn thiện thêm |
-| `/Staff/Readers` | Danh sách, tạo và sửa độc giả | Đã nối API |
-| `/Staff/Circulation?tab=list` | Danh sách khoản mượn | Đã nối API |
-| `/Staff/Circulation?tab=borrow` | Lập phiếu mượn | Đã nối API |
-| `/Staff/Circulation?tab=return` | Xử lý trả sách và phạt | Đã nối API |
-| `/Admin/Reports` | Báo cáo tổng quan, lưu thông, quá hạn, phạt | Đã nối API |
-| `/Admin/Users` | Quản trị người dùng | Khung UI; chưa có API quản trị đầy đủ |
-| `/Admin/Settings` | Cấu hình quản trị | Khung UI/demo, chưa phải cấu hình nghiệp vụ thật |
+| `/login` | Đăng nhập cookie session | Đã có Identity và API auth |
+| `/register` | Đăng ký tài khoản Reader và thẻ độc giả | Đã tạo Member/User trong transaction |
+| `/reader/account` | Hồ sơ, khoản mượn, lịch sử và đặt trước | Đã nối API; action bị giới hạn theo role |
+| `/staff/readers` | Danh sách, tạo và sửa độc giả | Đã nối API |
+| `/staff/circulation` | Danh sách, mượn, trả và gia hạn | Đã nối API |
+| `/admin/reports` | Báo cáo tổng quan, lưu thông, quá hạn, phạt | Đã nối API |
+| `/admin/users` | Quản trị người dùng | Chưa có UI/API đầy đủ; backlog |
+| `/admin/settings` | Cấu hình quản trị | Chưa có UI/API đầy đủ; backlog |
 
-Trong môi trường Development, một số trang có thể hiển thị khung workspace cho mục đích preview. API vẫn giữ phân quyền độc lập.
+Frontend route guard chỉ điều hướng trải nghiệm; API vẫn giữ phân quyền độc lập. Backend không còn Razor page route.
 
 ## 5. Chức năng theo nghiệp vụ
 
@@ -87,7 +82,21 @@ Trong môi trường Development, một số trang có thể hiển thị khung 
 - Đăng xuất xoá session qua cả API và form MVC.
 - Tài khoản không có role phù hợp sẽ nhận `401` hoặc `403`.
 
-### 5.2. Catalog sách
+### 5.2. Đăng ký tài khoản Reader
+
+Người dùng có thể tự đăng ký tại `/register`. Form nhận họ tên, email, username, mật khẩu xác nhận, số điện thoại và địa chỉ tùy chọn.
+
+Khi đăng ký thành công, backend trong cùng transaction SQL Server:
+
+1. Sinh số thẻ dạng `LIB-...` không trùng.
+2. Tạo Member trạng thái `Active`, loại `Reader`, thời hạn mặc định 1 năm và giới hạn 5 sách.
+3. Tạo ApplicationUser liên kết với Member.
+4. Đảm bảo role `Reader` tồn tại và gán role cho tài khoản.
+5. Chuyển người dùng về trang đăng nhập cùng thông báo số thẻ.
+
+Nếu tạo tài khoản hoặc cấp role thất bại, transaction rollback để không còn Member/User mồ côi. Người dùng không được tự đăng ký role `Staff` hoặc `Admin`.
+
+### 5.3. Catalog sách
 
 Catalog hỗ trợ:
 
@@ -101,7 +110,7 @@ Catalog hỗ trợ:
 
 Một cuốn sách (`Book`) có thể có nhiều bản sao vật lý (`BookCopy`). Việc mượn luôn thực hiện trên bản sao cụ thể, không chỉ trên metadata của sách.
 
-### 5.3. Quản lý độc giả
+### 5.4. Quản lý độc giả
 
 Staff/Admin có thể:
 
@@ -114,7 +123,7 @@ Các trạng thái độc giả gồm `Active`, `Suspended` và `Expired`. Độ
 
 Reader chỉ được truy cập dữ liệu Member được liên kết với tài khoản Identity của mình. Nếu tài khoản Reader chưa liên kết Member, API trả về lỗi thay vì trả nhầm dữ liệu.
 
-### 5.4. Mượn sách
+### 5.5. Mượn sách
 
 Staff/Admin gửi member và danh sách bản sao cần mượn. Backend kiểm tra:
 
@@ -126,7 +135,7 @@ Staff/Admin gửi member và danh sách bản sao cần mượn. Backend kiểm 
 
 Khi thành công, hệ thống tạo `Loan`, `LoanItem` và chuyển bản sao sang trạng thái `OnLoan`.
 
-### 5.5. Trả sách và tính phạt
+### 5.6. Trả sách và tính phạt
 
 Staff/Admin xử lý trả theo mã khoản mượn và tình trạng sách.
 
@@ -140,7 +149,7 @@ Staff/Admin xử lý trả theo mã khoản mượn và tình trạng sách.
 
 Hiện có dữ liệu `PaidAtUtc` trong model Fine nhưng chưa có API thu tiền/đánh dấu đã thu tiền hoàn chỉnh.
 
-### 5.6. Gia hạn
+### 5.7. Gia hạn
 
 Reader được gia hạn khoản mượn của chính mình; Staff/Admin có thể thực hiện theo quyền nghiệp vụ.
 
@@ -154,7 +163,7 @@ Reader được gia hạn khoản mượn của chính mình; Staff/Admin có th
 
 Mỗi khoản mượn được gia hạn tối đa một lần và thời hạn được cộng thêm 7 ngày. Vi phạm điều kiện trả về conflict thay vì âm thầm thay đổi dữ liệu.
 
-### 5.7. Đặt trước sách
+### 5.8. Đặt trước sách
 
 Reader, Staff và Admin có thể tạo đặt trước; Reader chỉ được đặt cho Member đã liên kết với chính tài khoản của mình.
 
@@ -167,7 +176,7 @@ Quy tắc chính:
 
 Việc tự động thông báo sách đã sẵn sàng chưa được triển khai trong MVP.
 
-### 5.8. Trang tài khoản Reader
+### 5.9. Trang tài khoản Reader
 
 Trang Reader Account tổng hợp:
 
@@ -180,7 +189,7 @@ Trang Reader Account tổng hợp:
 
 Dữ liệu được lấy từ `GET /api/reader/account`, không lấy từ localStorage hay dữ liệu demo.
 
-### 5.9. Báo cáo
+### 5.10. Báo cáo
 
 Staff/Admin có thể lấy báo cáo tổng quan theo khoảng thời gian, gồm các nhóm số liệu về:
 
@@ -201,6 +210,7 @@ Tất cả response nghiệp vụ dùng envelope thống nhất, thường có d
 | GET | `/api/health` | Public | Kiểm tra API đang hoạt động. |
 | GET | `/api/auth/me` | Auth | Lấy session và role hiện tại. |
 | POST | `/api/auth/login` | Public | Đăng nhập. |
+| POST | `/api/auth/register` | Public | Đăng ký tài khoản Reader và Member. |
 | POST | `/api/auth/logout` | Auth | Đăng xuất. |
 | GET | `/api/books` | Public | Danh sách catalog có lọc/phân trang. |
 | GET | `/api/books/{id}` | Public | Chi tiết sách. |
@@ -287,8 +297,7 @@ backend/QuanLyThuVien/
 ├─ Infrastructure/
 │  ├─ Authentication/     # Identity setup
 │  └─ Persistence/       # DbContext, configurations, migrations, seed
-├─ Controllers/           # MVC page shell và route theo role
-└─ Views/                 # Razor shell cho React workspace
+└─ QuanLyThuVien.csproj   # API host
 
 frontend/src/
 ├─ features/
@@ -302,7 +311,9 @@ frontend/src/
 ├─ shared/
 │  ├─ api/                # Axios client, envelope, API error
 │  └─ schemas/            # Zod schemas
-└─ components/            # Workspace shell và phần legacy đang giữ tương thích
+└─ app/                   # App root, layout và route guard
+└─ pages/                 # Các màn hình theo route
+└─ styles/                # Shared feature styles
 ```
 
 ## 10. Xử lý lỗi và trạng thái giao diện
@@ -335,7 +346,7 @@ Credential seed local phải truyền bằng environment variable hoặc user se
 
 Các mục sau chưa nên mô tả là đã hoàn thành:
 
-1. UI quản trị sách/thể loại/bản sao cần hoàn thiện đầy đủ trên Catalog API; hiện API và catalog đọc đã có, nhưng Staff Books vẫn còn workspace compatibility.
+1. UI quản trị sách/thể loại/bản sao cần hoàn thiện đầy đủ trên Catalog API; hiện API và catalog đọc đã có, nhưng chưa có route Staff Books riêng.
 2. Admin Users chưa có API quản trị tài khoản, gán role hoặc khoá tài khoản hoàn chỉnh.
 3. Admin Settings hiện là khung màn hình, chưa có cấu hình nghiệp vụ lưu SQL Server.
 4. Chưa có API ghi nhận đã thu tiền phạt hoặc quy trình thanh toán.
@@ -349,7 +360,7 @@ Các mục sau chưa nên mô tả là đã hoàn thành:
 
 Các kiểm tra đã thực hiện cho implementation hiện tại:
 
-- Backend tests: **21/21 passed**.
+- Backend tests: **23/23 passed**.
 - Frontend tests: **13/13 passed**.
 - Frontend TypeScript typecheck/build: **passed**.
 - Backend solution build: **passed**.

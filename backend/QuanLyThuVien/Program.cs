@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using QuanLyThuVien.Application.Common;
 using QuanLyThuVien.Application.Features.Auth;
+using QuanLyThuVien.Application.Features.Admin;
 using QuanLyThuVien.Application.Features.Catalog;
 using QuanLyThuVien.Application.Features.Members;
 using QuanLyThuVien.Application.Features.Circulation;
@@ -16,7 +17,7 @@ using QuanLyThuVien.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Development.local.json", optional: true, reloadOnChange: false);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 builder.Services.Configure<LibraryOptions>(builder.Configuration.GetSection(LibraryOptions.SectionName));
 builder.Services.AddDbContext<LibraryDbContext>((serviceProvider, options) =>
 {
@@ -32,6 +33,7 @@ builder.Services.AddDbContext<LibraryDbContext>((serviceProvider, options) =>
 builder.Services.AddLibraryIdentity();
 builder.Services.AddHealthChecks().AddDbContextCheck<LibraryDbContext>("sql-server");
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<CatalogService>();
 builder.Services.AddScoped<MemberService>();
 builder.Services.AddScoped<CirculationService>();
@@ -44,8 +46,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // Chỉ bật HSTS ngoài Development để không buộc trình duyệt ghi nhớ HTTPS cho các cổng thử cục bộ.
+    app.UseExceptionHandler();
     app.UseHsts();
 }
 
@@ -53,17 +54,11 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseMiddleware<ApiExceptionMiddleware>();
 
-// Khôi phục ClaimsPrincipal từ cookie trước khi middleware phân quyền và Razor đọc User/role.
+// Khôi phục ClaimsPrincipal từ cookie trước khi middleware phân quyền đọc User/role.
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
 app.MapControllers();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
 
 if (app.Configuration.GetValue<bool>("Library:SeedDevelopmentUsers"))
 {

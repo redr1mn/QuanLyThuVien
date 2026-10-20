@@ -4,13 +4,22 @@ Backend dùng SQL Server qua Entity Framework Core. Không commit mật khẩu, 
 
 ## Connection string
 
+Runtime của ASP.NET Core đọc biến `ConnectionStrings__LibraryDb`.
+
 PowerShell:
 
 ```powershell
 $env:ConnectionStrings__LibraryDb = 'Server=.;Database=QuanLyThuVien;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True'
 ```
 
-Sau đó chạy migration từ thư mục backend:
+Khi chạy lệnh EF Core ở design-time, `DesignTimeDbContextFactory` yêu cầu biến
+`LIBRARY_DB_CONNECTION`. Có thể gán cùng một giá trị:
+
+```powershell
+$env:LIBRARY_DB_CONNECTION = $env:ConnectionStrings__LibraryDb
+```
+
+Sau đó chạy migration từ thư mục `backend`:
 
 ```powershell
 dotnet ef database update --project QuanLyThuVien/QuanLyThuVien.csproj --startup-project QuanLyThuVien/QuanLyThuVien.csproj
@@ -39,3 +48,39 @@ React + Axios
 ```
 
 Circulation rechecks selected copies in a serializable transaction. Loan and fine history are stored in SQL Server; frontend state is only a server projection and never the authority.
+
+## URL khi chạy Development
+
+Đây là kiến trúc React SPA + ASP.NET Core API. Vite là frontend độc lập nên mở trực tiếp `http://localhost:5173/` sẽ render ứng dụng React. Vite proxy mọi request `/api` tới API backend.
+
+Mở giao diện tại:
+
+```text
+http://localhost:5173
+```
+
+Sau khi chạy cả Vite và ASP.NET Core, mở một trong các URL của backend:
+
+```text
+https://localhost:7244
+http://localhost:5194
+```
+
+Backend chỉ phục vụ API: `http://localhost:5194/` trả `404` là đúng. Health endpoint là `/api/health`.
+
+Chạy local bằng hai terminal:
+
+```powershell
+# Terminal 1
+dotnet run --project backend/QuanLyThuVien/QuanLyThuVien.csproj --launch-profile http
+
+# Terminal 2
+cd frontend
+npm run dev
+```
+
+HTTP có thể tự redirect sang HTTPS. Nếu trình duyệt cảnh báo chứng chỉ local, chạy:
+
+```powershell
+dotnet dev-certs https --trust
+```
