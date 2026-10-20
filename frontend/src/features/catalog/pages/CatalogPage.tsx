@@ -16,7 +16,7 @@ export default function CatalogPage() {
   const hasFilters = Boolean(searchTerm || availableOnly);
 
   return <section className="catalog-page" aria-labelledby="catalog-title">
-    <div className="catalog-hero"><div><span className="eyebrow">Tra cứu bộ sưu tập</span><h1 id="catalog-title">Tìm cuốn sách tiếp theo</h1><p>Khám phá danh mục hiện có và kiểm tra sách đang sẵn sàng trên kệ.</p></div><span className="catalog-count">{totalCount} đầu sách</span></div>
+    <div className="catalog-heading"><div><span className="eyebrow">Danh mục thư viện</span><h1 id="catalog-title">Tra cứu sách</h1></div><span className="catalog-count">{totalCount} đầu sách</span></div>
     <div className="catalog-toolbar" role="search">
       <label className="search-field"><span>Tìm trong thư viện</span><input aria-label="Tìm sách" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Tên sách hoặc tác giả" /></label>
       <label className="availability-toggle"><input type="checkbox" checked={availableOnly} onChange={(event) => void load({ availableOnly: event.target.checked, page: 1 })} /> <span>Chỉ hiện sách còn</span></label>
