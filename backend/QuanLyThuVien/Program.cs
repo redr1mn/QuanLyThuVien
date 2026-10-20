@@ -44,8 +44,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // Chỉ bật HSTS ngoài Development để không buộc trình duyệt ghi nhớ HTTPS cho các cổng thử cục bộ.
+    app.UseExceptionHandler();
     app.UseHsts();
 }
 
@@ -53,7 +52,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseMiddleware<ApiExceptionMiddleware>();
 
-// Khôi phục ClaimsPrincipal từ cookie trước khi middleware phân quyền và Razor đọc User/role.
+// Khôi phục ClaimsPrincipal từ cookie trước khi middleware phân quyền đọc User/role.
 app.UseAuthentication();
 app.UseAuthorization();
 
