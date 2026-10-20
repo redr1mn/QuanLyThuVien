@@ -28,3 +28,9 @@ test('catalog UX includes debounced search and explicit result states', () => {
   assert.match(catalog, /totalCount/);
   assert.match(catalog, /Đặt lại bộ lọc/);
 });
+
+test('API connectivity errors explain how to start the backend', () => {
+  const errors = read('src/shared/api/api-error.ts');
+  assert.match(errors, /Không kết nối được API/);
+  assert.match(errors, /5194/);
+});
