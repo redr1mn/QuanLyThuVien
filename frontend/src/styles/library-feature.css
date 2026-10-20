@@ -1,3 +1,5 @@
+/* Shared visual language for the feature pages. */
+
 .ws-root { color: var(--ink); font-family: var(--font-sans); font-size: .875rem; line-height: 1.6; }
 .ws-root *, .ws-root *::before, .ws-root *::after { box-sizing: border-box; }
 .ws-root h2 { font-size: 1.875rem; margin: 0 0 16px; }
@@ -104,3 +106,4 @@
   .ws-dialog[open] { position: static; max-height: none; width: 100%; overflow: visible; border: 0; }
   .ws-dialog[open]::backdrop { background: transparent; }
 }
+

@@ -20,12 +20,12 @@ Tài liệu này mô tả chức năng hiện có trong source code. Những ph�
 ## 2. Kiến trúc và luồng dữ liệu
 
 ```text
-React/Vite
+React SPA/Vite (`frontend`)
   ├─ Axios: gọi HTTP API
   ├─ Zod: kiểm tra dữ liệu response/request ở frontend
   └─ Zustand: lưu state theo feature
         ↓ cookie session
-ASP.NET Core MVC/Razor + API Controllers
+ASP.NET Core API (`backend`)
         ↓
 Application Services + Domain Rules
         ↓ EF Core
@@ -60,22 +60,16 @@ Các API protected kiểm tra role ở backend. Việc ẩn menu ở frontend ch
 | Route | Mục đích | Trạng thái hiện tại |
 |---|---|---|
 | `/` | Catalog công khai, tìm kiếm và lọc sách | Đã nối Catalog API |
-| `/Account/Login` | Đăng nhập cookie session | Đã có Identity và anti-forgery |
-| `/Account/Register` | Đăng ký tài khoản Reader và thẻ độc giả | Đã tạo Member/User trong transaction |
-| `/Reader/Account?tab=profile` | Hồ sơ và tổng quan tài khoản độc giả | Đã nối API |
-| `/Reader/Account?tab=loans` | Khoản đang mượn và gia hạn | Đã nối API |
-| `/Reader/Account?tab=history` | Lịch sử mượn trả | Đã nối API |
-| `/Reader/Account?tab=reservations` | Danh sách/huỷ đặt trước | Đã có API; giao diện còn theo workspace |
-| `/Staff/Books` | Quản lý sách và bản sao | Có route và API; UI quản trị sách còn cần hoàn thiện thêm |
-| `/Staff/Readers` | Danh sách, tạo và sửa độc giả | Đã nối API |
-| `/Staff/Circulation?tab=list` | Danh sách khoản mượn | Đã nối API |
-| `/Staff/Circulation?tab=borrow` | Lập phiếu mượn | Đã nối API |
-| `/Staff/Circulation?tab=return` | Xử lý trả sách và phạt | Đã nối API |
-| `/Admin/Reports` | Báo cáo tổng quan, lưu thông, quá hạn, phạt | Đã nối API |
-| `/Admin/Users` | Quản trị người dùng | Khung UI; chưa có API quản trị đầy đủ |
-| `/Admin/Settings` | Cấu hình quản trị | Khung UI/demo, chưa phải cấu hình nghiệp vụ thật |
+| `/login` | Đăng nhập cookie session | Đã có Identity và API auth |
+| `/register` | Đăng ký tài khoản Reader và thẻ độc giả | Đã tạo Member/User trong transaction |
+| `/reader/account` | Hồ sơ, khoản mượn, lịch sử và đặt trước | Đã nối API; action bị giới hạn theo role |
+| `/staff/readers` | Danh sách, tạo và sửa độc giả | Đã nối API |
+| `/staff/circulation` | Danh sách, mượn, trả và gia hạn | Đã nối API |
+| `/admin/reports` | Báo cáo tổng quan, lưu thông, quá hạn, phạt | Đã nối API |
+| `/admin/users` | Quản trị người dùng | Chưa có UI/API đầy đủ; backlog |
+| `/admin/settings` | Cấu hình quản trị | Chưa có UI/API đầy đủ; backlog |
 
-Trong môi trường Development, một số trang có thể hiển thị khung workspace cho mục đích preview. API vẫn giữ phân quyền độc lập.
+Frontend route guard chỉ điều hướng trải nghiệm; API vẫn giữ phân quyền độc lập. Backend không còn Razor page route.
 
 ## 5. Chức năng theo nghiệp vụ
 
@@ -90,7 +84,7 @@ Trong môi trường Development, một số trang có thể hiển thị khung 
 
 ### 5.2. Đăng ký tài khoản Reader
 
-Người dùng có thể tự đăng ký tại `/Account/Register`. Form nhận họ tên, email, username, mật khẩu xác nhận, số điện thoại và địa chỉ tùy chọn.
+Người dùng có thể tự đăng ký tại `/register`. Form nhận họ tên, email, username, mật khẩu xác nhận, số điện thoại và địa chỉ tùy chọn.
 
 Khi đăng ký thành công, backend trong cùng transaction SQL Server:
 
@@ -303,8 +297,7 @@ backend/QuanLyThuVien/
 ├─ Infrastructure/
 │  ├─ Authentication/     # Identity setup
 │  └─ Persistence/       # DbContext, configurations, migrations, seed
-├─ Controllers/           # MVC page shell và route theo role
-└─ Views/                 # Razor shell cho React workspace
+└─ QuanLyThuVien.csproj   # API host
 
 frontend/src/
 ├─ features/
@@ -318,7 +311,9 @@ frontend/src/
 ├─ shared/
 │  ├─ api/                # Axios client, envelope, API error
 │  └─ schemas/            # Zod schemas
-└─ components/            # Workspace shell và phần legacy đang giữ tương thích
+└─ app/                   # App root, layout và route guard
+└─ pages/                 # Các màn hình theo route
+└─ styles/                # Shared feature styles
 ```
 
 ## 10. Xử lý lỗi và trạng thái giao diện
@@ -351,7 +346,7 @@ Credential seed local phải truyền bằng environment variable hoặc user se
 
 Các mục sau chưa nên mô tả là đã hoàn thành:
 
-1. UI quản trị sách/thể loại/bản sao cần hoàn thiện đầy đủ trên Catalog API; hiện API và catalog đọc đã có, nhưng Staff Books vẫn còn workspace compatibility.
+1. UI quản trị sách/thể loại/bản sao cần hoàn thiện đầy đủ trên Catalog API; hiện API và catalog đọc đã có, nhưng chưa có route Staff Books riêng.
 2. Admin Users chưa có API quản trị tài khoản, gán role hoặc khoá tài khoản hoàn chỉnh.
 3. Admin Settings hiện là khung màn hình, chưa có cấu hình nghiệp vụ lưu SQL Server.
 4. Chưa có API ghi nhận đã thu tiền phạt hoặc quy trình thanh toán.

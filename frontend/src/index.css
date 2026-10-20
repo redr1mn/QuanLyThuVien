@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* The Living Colophon: ba giọng chữ dùng chung cho Razor và React. */
+/* The Living Colophon: ba giọng chữ dùng chung cho React. */
 @theme {
   --font-serif: 'Newsreader', Georgia, serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;

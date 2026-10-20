@@ -51,13 +51,32 @@ Circulation rechecks selected copies in a serializable transaction. Loan and fin
 
 ## URL khi chạy Development
 
-Đây là ứng dụng hybrid: `5173` chỉ là Vite asset/HMR server, không phải trang web độc lập. Vì project không có `frontend/index.html`, mở trực tiếp `http://localhost:5173/` sẽ trả `404` và đó là bình thường.
+Đây là kiến trúc React SPA + ASP.NET Core API. Vite là frontend độc lập nên mở trực tiếp `http://localhost:5173/` sẽ render ứng dụng React. Vite proxy mọi request `/api` tới API backend.
+
+Mở giao diện tại:
+
+```text
+http://localhost:5173
+```
 
 Sau khi chạy cả Vite và ASP.NET Core, mở một trong các URL của backend:
 
 ```text
 https://localhost:7244
 http://localhost:5194
+```
+
+Backend chỉ phục vụ API: `http://localhost:5194/` trả `404` là đúng. Health endpoint là `/api/health`.
+
+Chạy local bằng hai terminal:
+
+```powershell
+# Terminal 1
+dotnet run --project backend/QuanLyThuVien/QuanLyThuVien.csproj --launch-profile http
+
+# Terminal 2
+cd frontend
+npm run dev
 ```
 
 HTTP có thể tự redirect sang HTTPS. Nếu trình duyệt cảnh báo chứng chỉ local, chạy:
