@@ -31,7 +31,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       set({ user: await authApi.me(), isLoading: false });
     } catch (error) {
-      set({ user: null, isLoading: false, error: messageFromError(error) });
+      // A missing session is a normal public-route state. Only form actions surface API errors.
+      set({ user: null, isLoading: false, error: null });
     }
   },
   login: async (input) => {

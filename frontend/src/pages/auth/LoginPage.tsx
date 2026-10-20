@@ -2,11 +2,13 @@ import { FormEvent, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { loginInputSchema } from '../../features/auth/schemas/auth';
 import { useAuthStore } from '../../features/auth/store/auth-store';
+import { PasswordField } from '../../shared/components/PasswordField';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoading, error } = useAuthStore();
+  const registeredCardNumber = (location.state as { cardNumber?: string } | null)?.cardNumber;
   const [form, setForm] = useState({ username: '', password: '', rememberMe: false });
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -24,16 +26,18 @@ export default function LoginPage() {
     }
   }
 
-  return <section className="mx-auto max-w-md" aria-labelledby="login-title">
-    <h1 id="login-title" className="font-serif text-4xl">Đăng nhập</h1>
-    <p className="mt-3 text-[#5C5954]">Sử dụng tài khoản thư viện để tiếp tục.</p>
-    {(validationError || error) && <p className="mt-5 border-l-2 border-[#8C2D19] bg-[#E8E3D8] p-3 text-[#8C2D19]" role="alert">{validationError ?? error}</p>}
-    <form className="mt-8 grid gap-5" onSubmit={submit}>
-      <label className="grid gap-2">Tên đăng nhập hoặc email<input className="min-h-12 border border-[#D2CBB8] bg-[#E8E3D8] px-3" value={form.username} onChange={(event) => setForm({ ...form, username: event.target.value })} autoComplete="username" /></label>
-      <label className="grid gap-2">Mật khẩu<input className="min-h-12 border border-[#D2CBB8] bg-[#E8E3D8] px-3" type="password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} autoComplete="current-password" /></label>
-      <label className="flex items-center gap-3"><input type="checkbox" checked={form.rememberMe} onChange={(event) => setForm({ ...form, rememberMe: event.target.checked })} /> Ghi nhớ đăng nhập</label>
-      <button className="min-h-12 bg-[#141413] px-6 text-[#F4F1EA] disabled:opacity-50" disabled={isLoading}>{isLoading ? 'Đang đăng nhập…' : 'Đăng nhập'}</button>
-    </form>
-    <p className="mt-6 text-[#5C5954]">Chưa có tài khoản? <Link className="text-[#8C2D19] underline" to="/register">Đăng ký tài khoản Reader</Link></p>
+  return <section className="auth-page" aria-labelledby="login-title">
+    <div className="auth-intro"><span className="eyebrow">Không gian đọc</span><h1 id="login-title">Đăng nhập để tiếp tục</h1><p>Quản lý sách đang mượn, lịch sử và quyền truy cập thư viện của bạn.</p></div>
+    <div className="auth-card">
+      {registeredCardNumber && <p className="notice notice-success" role="status">Đăng ký thành công. Số thẻ của bạn là <strong>{registeredCardNumber}</strong>. Hãy đăng nhập để bắt đầu.</p>}
+      {(validationError || error) && <p className="notice notice-error" role="alert">{validationError ?? error}</p>}
+      <form className="auth-form" onSubmit={submit}>
+        <div className="form-field"><label htmlFor="login-username">Tên đăng nhập hoặc email</label><input id="login-username" value={form.username} onChange={(event) => setForm({ ...form, username: event.target.value })} autoComplete="username" /></div>
+        <PasswordField label="Mật khẩu" value={form.password} onChange={value => setForm({ ...form, password: value })} autoComplete="current-password" />
+        <label className="checkbox-field"><input type="checkbox" checked={form.rememberMe} onChange={(event) => setForm({ ...form, rememberMe: event.target.checked })} /> Ghi nhớ đăng nhập</label>
+        <button className="primary-button" disabled={isLoading}>{isLoading ? 'Đang đăng nhập…' : 'Đăng nhập'}</button>
+      </form>
+    </div>
+    <p className="auth-switch">Chưa có tài khoản? <Link to="/register">Đăng ký tài khoản Reader</Link></p>
   </section>;
 }

@@ -7,6 +7,17 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
+:root {
+  --paper: #F4F1EA;
+  --paper-deep: #E8E3D8;
+  --rule: #D2CBB8;
+  --ink: #141413;
+  --ink-soft: #5C5954;
+  --oxblood: #8C2D19;
+  --oxblood-dark: #6E2012;
+  --stamp: #1E3A5F;
+}
+
 /* Let the header gap control vertical rhythm without Bootstrap text margins. */
 .bc-root .bc-catalog-header h1,
 .bc-root .bc-catalog-header p {
