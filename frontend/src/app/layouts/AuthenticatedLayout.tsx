@@ -9,6 +9,8 @@ const navItems: Array<{ to: string; label: string; roles: AuthSession['role'][] 
   { to: '/staff/readers', label: 'Độc giả', roles: ['Staff', 'Admin'] },
   { to: '/staff/circulation', label: 'Mượn trả', roles: ['Staff', 'Admin'] },
   { to: '/admin/reports', label: 'Báo cáo', roles: ['Staff', 'Admin'] },
+  { to: '/admin/dashboard', label: 'Tổng quan', roles: ['Admin'] },
+  { to: '/admin/users', label: 'Tài khoản', roles: ['Admin'] },
 ] as const;
 
 export default function AuthenticatedLayout() {

@@ -10,6 +10,9 @@ test('role routes use real feature pages and backend-backed guards', () => {
   assert.match(routes, /MembersPage/);
   assert.match(routes, /CirculationPage/);
   assert.match(routes, /ReportsPage/);
+  assert.match(routes, /AdminDashboardPage/);
+  assert.match(routes, /AdminUsersPage/);
+  assert.match(routes, /roles=\{\['Admin'\]\}/);
   assert.match(routes, /RequireRole/);
   assert.doesNotMatch(routes, /Workspace/);
 });

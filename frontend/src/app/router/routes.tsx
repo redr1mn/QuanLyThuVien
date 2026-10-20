@@ -4,6 +4,8 @@ import CirculationPage from '../../features/circulation/pages/CirculationPage';
 import MembersPage from '../../features/members/pages/MembersPage';
 import ReaderAccountPage from '../../features/reader-account/pages/ReaderAccountPage';
 import ReportsPage from '../../features/reports/pages/ReportsPage';
+import AdminDashboardPage from '../../features/admin/pages/AdminDashboardPage';
+import AdminUsersPage from '../../features/admin/pages/AdminUsersPage';
 import LoginPage from '../../pages/auth/LoginPage';
 import RegisterPage from '../../pages/auth/RegisterPage';
 import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
@@ -27,6 +29,8 @@ export function AppRoutes() {
         <Route path="staff/readers" element={<RequireRole roles={['Staff', 'Admin']}><MembersPage /></RequireRole>} />
         <Route path="staff/circulation" element={<RequireRole roles={['Staff', 'Admin']}><CirculationPage /></RequireRole>} />
         <Route path="admin/reports" element={<RequireRole roles={['Staff', 'Admin']}><ReportsPage /></RequireRole>} />
+        <Route path="admin/dashboard" element={<RequireRole roles={['Admin']}><AdminDashboardPage /></RequireRole>} />
+        <Route path="admin/users" element={<RequireRole roles={['Admin']}><AdminUsersPage /></RequireRole>} />
       </Route>
       <Route path="*" element={<PlaceholderPage title="Không tìm thấy trang" />} />
     </Routes>

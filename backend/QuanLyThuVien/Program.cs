@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using QuanLyThuVien.Application.Common;
 using QuanLyThuVien.Application.Features.Auth;
+using QuanLyThuVien.Application.Features.Admin;
 using QuanLyThuVien.Application.Features.Catalog;
 using QuanLyThuVien.Application.Features.Members;
 using QuanLyThuVien.Application.Features.Circulation;
@@ -32,6 +33,7 @@ builder.Services.AddDbContext<LibraryDbContext>((serviceProvider, options) =>
 builder.Services.AddLibraryIdentity();
 builder.Services.AddHealthChecks().AddDbContextCheck<LibraryDbContext>("sql-server");
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<CatalogService>();
 builder.Services.AddScoped<MemberService>();
 builder.Services.AddScoped<CirculationService>();
