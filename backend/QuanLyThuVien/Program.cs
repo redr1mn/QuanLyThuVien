@@ -16,7 +16,7 @@ using QuanLyThuVien.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Development.local.json", optional: true, reloadOnChange: false);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 builder.Services.Configure<LibraryOptions>(builder.Configuration.GetSection(LibraryOptions.SectionName));
 builder.Services.AddDbContext<LibraryDbContext>((serviceProvider, options) =>
 {
@@ -57,13 +57,7 @@ app.UseMiddleware<ApiExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
 app.MapControllers();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
 
 if (app.Configuration.GetValue<bool>("Library:SeedDevelopmentUsers"))
 {
