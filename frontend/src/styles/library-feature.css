@@ -123,8 +123,8 @@
 .library-primary-link, .primary-button { background: var(--ink); color: var(--paper); }
 .library-primary-link { padding: 9px 14px; }
 .library-menu-toggle { display: none; border: 1px solid var(--rule); background: transparent; padding: 8px 10px; }
-.catalog-hero { display: flex; justify-content: space-between; gap: 24px; align-items: end; padding: 24px 0 36px; border-bottom: 1px solid var(--rule); }
-.catalog-hero h1, .auth-intro h1 { max-width: 12ch; margin: 8px 0 12px; font-family: var(--font-serif); font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 500; line-height: .98; letter-spacing: -.04em; }
+.catalog-hero { display: flex; justify-content: space-between; gap: 24px; align-items: end; padding: 12px 0 22px; border-bottom: 1px solid var(--rule); }
+.catalog-hero h1, .auth-intro h1 { max-width: 16ch; margin: 6px 0 10px; font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 500; line-height: 1.02; letter-spacing: -.035em; }
 .catalog-hero p, .auth-intro p { max-width: 52ch; margin: 0; color: var(--ink-soft); }
 .eyebrow { color: var(--oxblood); font-family: var(--font-mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
 .catalog-count { padding: 10px 0; color: var(--ink-soft); font-family: var(--font-mono); font-size: .75rem; white-space: nowrap; }
