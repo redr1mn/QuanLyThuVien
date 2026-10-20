@@ -107,7 +107,8 @@ Nếu bạn không muốn chạy đồng thời 2 terminal hoặc muốn kiểm 
 
 ### Chức năng đã triển khai
 
-- Trang `/Account/Login` có tên đăng nhập/email, mật khẩu, hiện/ẩn mật khẩu, ghi nhớ đăng nhập và thông báo lỗi.
+- Trang `/Account/Login` có tên đăng nhập/email, mật khẩu, hiện/ẩn mật khẩu, ghi nhớ đăng nhập, link sang đăng ký và thông báo lỗi.
+- Trang `/Account/Register` cho phép người dùng tự tạo tài khoản Reader, hồ sơ Member và số thẻ thư viện được sinh tự động.
 - Validation phía trình duyệt và server: bắt buộc nhập, giới hạn tên đăng nhập 100 ký tự và mật khẩu 128 ký tự.
 - Có ba nút điền nhanh tên tài khoản mẫu. Người dùng tự nhập mật khẩu và bấm **Đăng nhập**.
 - Xác thực bằng cookie `QuanLyThuVien.Session`, lưu claim ID, tên hiển thị và vai trò. Cookie có `HttpOnly` và `SameSite=Lax`.
@@ -174,7 +175,8 @@ Nếu thay đổi controller hoặc cấu hình xác thực nhưng ứng dụng 
 - [x] Kiểm tra trạng thái tài khoản bị khóa/ngừng hoạt động.
 - [x] Thêm `[Authorize]`, role/policy cho controller, action và API; kiểm tra quyền và phạm vi dữ liệu ở backend.
 - [ ] Giữ quyền lập phiếu mượn và xử lý trả sách cho Staff theo đặc tả; không tự cấp cho Admin chỉ vì có menu quản lý.
-- [ ] Triển khai cấp tài khoản, đổi mật khẩu, quên/đặt lại mật khẩu; hiện chỉ có hướng dẫn liên hệ thủ thư.
+- [x] Cho phép tự đăng ký tài khoản Reader và tạo hồ sơ Member liên kết.
+- [ ] Đổi mật khẩu, quên/đặt lại mật khẩu; hiện chưa có email verification.
 - [ ] Giới hạn số lần thử đăng nhập, khóa tạm thời và ghi nhật ký phù hợp.
 - [ ] Thu hồi phiên khi tài khoản bị khóa, đổi mật khẩu hoặc thay đổi quyền.
 - [ ] Lấy thêm thẻ, lịch sử và tiền phạt cho màn hình tài khoản độc giả đầy đủ.

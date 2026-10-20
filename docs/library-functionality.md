@@ -61,6 +61,7 @@ Các API protected kiểm tra role ở backend. Việc ẩn menu ở frontend ch
 |---|---|---|
 | `/` | Catalog công khai, tìm kiếm và lọc sách | Đã nối Catalog API |
 | `/Account/Login` | Đăng nhập cookie session | Đã có Identity và anti-forgery |
+| `/Account/Register` | Đăng ký tài khoản Reader và thẻ độc giả | Đã tạo Member/User trong transaction |
 | `/Reader/Account?tab=profile` | Hồ sơ và tổng quan tài khoản độc giả | Đã nối API |
 | `/Reader/Account?tab=loans` | Khoản đang mượn và gia hạn | Đã nối API |
 | `/Reader/Account?tab=history` | Lịch sử mượn trả | Đã nối API |
@@ -87,7 +88,21 @@ Trong môi trường Development, một số trang có thể hiển thị khung 
 - Đăng xuất xoá session qua cả API và form MVC.
 - Tài khoản không có role phù hợp sẽ nhận `401` hoặc `403`.
 
-### 5.2. Catalog sách
+### 5.2. Đăng ký tài khoản Reader
+
+Người dùng có thể tự đăng ký tại `/Account/Register`. Form nhận họ tên, email, username, mật khẩu xác nhận, số điện thoại và địa chỉ tùy chọn.
+
+Khi đăng ký thành công, backend trong cùng transaction SQL Server:
+
+1. Sinh số thẻ dạng `LIB-...` không trùng.
+2. Tạo Member trạng thái `Active`, loại `Reader`, thời hạn mặc định 1 năm và giới hạn 5 sách.
+3. Tạo ApplicationUser liên kết với Member.
+4. Đảm bảo role `Reader` tồn tại và gán role cho tài khoản.
+5. Chuyển người dùng về trang đăng nhập cùng thông báo số thẻ.
+
+Nếu tạo tài khoản hoặc cấp role thất bại, transaction rollback để không còn Member/User mồ côi. Người dùng không được tự đăng ký role `Staff` hoặc `Admin`.
+
+### 5.3. Catalog sách
 
 Catalog hỗ trợ:
 
@@ -101,7 +116,7 @@ Catalog hỗ trợ:
 
 Một cuốn sách (`Book`) có thể có nhiều bản sao vật lý (`BookCopy`). Việc mượn luôn thực hiện trên bản sao cụ thể, không chỉ trên metadata của sách.
 
-### 5.3. Quản lý độc giả
+### 5.4. Quản lý độc giả
 
 Staff/Admin có thể:
 
@@ -114,7 +129,7 @@ Các trạng thái độc giả gồm `Active`, `Suspended` và `Expired`. Độ
 
 Reader chỉ được truy cập dữ liệu Member được liên kết với tài khoản Identity của mình. Nếu tài khoản Reader chưa liên kết Member, API trả về lỗi thay vì trả nhầm dữ liệu.
 
-### 5.4. Mượn sách
+### 5.5. Mượn sách
 
 Staff/Admin gửi member và danh sách bản sao cần mượn. Backend kiểm tra:
 
@@ -126,7 +141,7 @@ Staff/Admin gửi member và danh sách bản sao cần mượn. Backend kiểm 
 
 Khi thành công, hệ thống tạo `Loan`, `LoanItem` và chuyển bản sao sang trạng thái `OnLoan`.
 
-### 5.5. Trả sách và tính phạt
+### 5.6. Trả sách và tính phạt
 
 Staff/Admin xử lý trả theo mã khoản mượn và tình trạng sách.
 
@@ -140,7 +155,7 @@ Staff/Admin xử lý trả theo mã khoản mượn và tình trạng sách.
 
 Hiện có dữ liệu `PaidAtUtc` trong model Fine nhưng chưa có API thu tiền/đánh dấu đã thu tiền hoàn chỉnh.
 
-### 5.6. Gia hạn
+### 5.7. Gia hạn
 
 Reader được gia hạn khoản mượn của chính mình; Staff/Admin có thể thực hiện theo quyền nghiệp vụ.
 
@@ -154,7 +169,7 @@ Reader được gia hạn khoản mượn của chính mình; Staff/Admin có th
 
 Mỗi khoản mượn được gia hạn tối đa một lần và thời hạn được cộng thêm 7 ngày. Vi phạm điều kiện trả về conflict thay vì âm thầm thay đổi dữ liệu.
 
-### 5.7. Đặt trước sách
+### 5.8. Đặt trước sách
 
 Reader, Staff và Admin có thể tạo đặt trước; Reader chỉ được đặt cho Member đã liên kết với chính tài khoản của mình.
 
@@ -167,7 +182,7 @@ Quy tắc chính:
 
 Việc tự động thông báo sách đã sẵn sàng chưa được triển khai trong MVP.
 
-### 5.8. Trang tài khoản Reader
+### 5.9. Trang tài khoản Reader
 
 Trang Reader Account tổng hợp:
 
@@ -180,7 +195,7 @@ Trang Reader Account tổng hợp:
 
 Dữ liệu được lấy từ `GET /api/reader/account`, không lấy từ localStorage hay dữ liệu demo.
 
-### 5.9. Báo cáo
+### 5.10. Báo cáo
 
 Staff/Admin có thể lấy báo cáo tổng quan theo khoảng thời gian, gồm các nhóm số liệu về:
 
@@ -201,6 +216,7 @@ Tất cả response nghiệp vụ dùng envelope thống nhất, thường có d
 | GET | `/api/health` | Public | Kiểm tra API đang hoạt động. |
 | GET | `/api/auth/me` | Auth | Lấy session và role hiện tại. |
 | POST | `/api/auth/login` | Public | Đăng nhập. |
+| POST | `/api/auth/register` | Public | Đăng ký tài khoản Reader và Member. |
 | POST | `/api/auth/logout` | Auth | Đăng xuất. |
 | GET | `/api/books` | Public | Danh sách catalog có lọc/phân trang. |
 | GET | `/api/books/{id}` | Public | Chi tiết sách. |
@@ -349,7 +365,7 @@ Các mục sau chưa nên mô tả là đã hoàn thành:
 
 Các kiểm tra đã thực hiện cho implementation hiện tại:
 
-- Backend tests: **21/21 passed**.
+- Backend tests: **23/23 passed**.
 - Frontend tests: **13/13 passed**.
 - Frontend TypeScript typecheck/build: **passed**.
 - Backend solution build: **passed**.

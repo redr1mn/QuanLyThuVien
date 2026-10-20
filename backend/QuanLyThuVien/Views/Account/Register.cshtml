@@ -1,0 +1,81 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+@section Head {
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+}
+<div class="library-auth">
+    <aside class="library-auth-intro" aria-labelledby="auth-intro-title">
+        <a class="library-auth-back" asp-controller="Home" asp-action="Index">Về mục lục sách</a>
+        <div>
+            <svg class="library-auth-art" viewBox="0 0 240 160" fill="none" aria-hidden="true" focusable="false">
+                <path d="M30 136h180M43 34h28v101H43zM80 18h22v117H80zM111 43h27v92h-27zM151 31l22-5 25 105-22 5z" stroke="currentColor" stroke-width="1.5" />
+                <path d="M48 49h18M48 116h18M85 34h12M85 116h12M116 58h17M116 116h17M155 48l22-5M171 117l22-5" stroke="currentColor" />
+            </svg>
+            <h2 id="auth-intro-title">Mở thẻ cho<br /><em>những trang sắp đọc.</em></h2>
+            <p>Tạo tài khoản độc giả để tra cứu sách, theo dõi hạn trả và quản lý các lượt đặt trước.</p>
+        </div>
+        <p class="library-auth-help">Tài khoản mới được cấp role Reader và liên kết với một thẻ độc giả. Tài khoản Staff/Admin do quản trị viên cấp.</p>
+    </aside>
+
+    <section class="library-auth-panel" aria-labelledby="page-title">
+        <div class="library-auth-form-wrap">
+            <h1 id="page-title">Đăng ký</h1>
+            <p class="library-auth-lead">Tạo tài khoản độc giả miễn phí.</p>
+            <form asp-controller="Account" asp-action="Register" method="post" class="library-auth-form">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="library-auth-errors" role="alert" tabindex="-1"></div>
+                <div class="library-auth-form-grid">
+                    <div class="library-auth-field">
+                        <label asp-for="FullName"></label>
+                        <input asp-for="FullName" autocomplete="name" maxlength="200" required />
+                        <span asp-validation-for="FullName" class="library-auth-field-error"></span>
+                    </div>
+                    <div class="library-auth-field">
+                        <label asp-for="Email"></label>
+                        <input asp-for="Email" type="email" autocomplete="email" maxlength="320" required />
+                        <span asp-validation-for="Email" class="library-auth-field-error"></span>
+                    </div>
+                    <div class="library-auth-field">
+                        <label asp-for="Username"></label>
+                        <input asp-for="Username" autocomplete="username" maxlength="100" required />
+                        <span asp-validation-for="Username" class="library-auth-field-error"></span>
+                    </div>
+                    <div class="library-auth-field">
+                        <label asp-for="Phone"></label>
+                        <input asp-for="Phone" type="tel" autocomplete="tel" maxlength="30" />
+                        <span asp-validation-for="Phone" class="library-auth-field-error"></span>
+                    </div>
+                    <div class="library-auth-field">
+                        <label asp-for="Password"></label>
+                        <div class="library-auth-password">
+                            <input asp-for="Password" autocomplete="new-password" maxlength="128" required />
+                            <button type="button" data-password-toggle="Password" aria-controls="Password" aria-pressed="false">Hiện</button>
+                        </div>
+                        <span asp-validation-for="Password" class="library-auth-field-error"></span>
+                    </div>
+                    <div class="library-auth-field">
+                        <label asp-for="ConfirmPassword"></label>
+                        <div class="library-auth-password">
+                            <input asp-for="ConfirmPassword" autocomplete="new-password" maxlength="128" required />
+                            <button type="button" data-password-toggle="ConfirmPassword" aria-controls="ConfirmPassword" aria-pressed="false">Hiện</button>
+                        </div>
+                        <span asp-validation-for="ConfirmPassword" class="library-auth-field-error"></span>
+                    </div>
+                    <div class="library-auth-field library-auth-field-wide">
+                        <label asp-for="Address"></label>
+                        <input asp-for="Address" autocomplete="street-address" maxlength="500" />
+                        <span asp-validation-for="Address" class="library-auth-field-error"></span>
+                    </div>
+                </div>
+                <button type="submit" class="library-auth-submit">Tạo tài khoản</button>
+            </form>
+            <p class="library-auth-switch">Đã có tài khoản? <a asp-controller="Account" asp-action="Login">Đăng nhập</a></p>
+        </div>
+    </section>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/login.js" asp-append-version="true"></script>
+}
