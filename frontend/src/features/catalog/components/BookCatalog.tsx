@@ -50,7 +50,7 @@ function AvailabilityStamp({ book }: { book: Book }) {
 function Cover({ book, lift = false, stamp = false }: { book: Book; lift?: boolean; stamp?: boolean }) {
   return (
     <div
-      className={`relative aspect-[3/4] overflow-hidden border border-l-4 border-[#D2CBB8] border-l-[#8C2D19] bg-[#E8E3D8] ${
+      className={`relative aspect-[3/4] overflow-hidden border border-[#D2CBB8] bg-[#E8E3D8] ${
         lift
           ? 'transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:shadow-[-6px_6px_0px_#141413]'
           : ''
@@ -67,7 +67,6 @@ function Cover({ book, lift = false, stamp = false }: { book: Book; lift?: boole
         onError={(e) => { e.currentTarget.style.display = 'none'; }}
         className="absolute inset-0 h-full w-full object-cover sepia-[.2] contrast-95"
       />}
-      <span aria-hidden className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/30 to-transparent" />
       <span
         aria-hidden
         className="absolute inset-y-0 right-0 w-1.5 border-l border-[#D2CBB8] bg-[repeating-linear-gradient(180deg,#F4F1EA_0_2px,#D2CBB8_2px_3px)]"
@@ -200,7 +199,7 @@ export default function BookCatalog({ books, categories, totalCount, page, pageS
 
       <section className="lg:col-span-9" aria-labelledby="catalog-title">
         <header className="bc-catalog-header flex flex-col gap-3 border-b border-[#D2CBB8] bg-[#F4F1EA] px-6 py-4 lg:px-8 lg:py-5">
-          <h1 id="catalog-title" className="font-serif text-4xl font-medium leading-tight tracking-tight md:text-5xl">
+          <h1 id="catalog-title" className="sr-only">
             Tra Cứu &amp; Chi Tiết Sách Thư Viện
           </h1>
 

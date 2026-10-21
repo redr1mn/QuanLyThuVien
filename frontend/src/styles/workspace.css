@@ -75,7 +75,26 @@
 .ws-track { height: 22px; background: var(--paper-deep); }
 .ws-track > span { display: block; height: 100%; background: var(--stamp); }
 .ws-distribution { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--rule); padding: 14px 0; }
-.ws-dialog { width: min(760px, calc(100% - 32px)); max-height: calc(100dvh - 48px); overflow: auto; padding: clamp(20px, 4vw, 36px); border: 1px solid var(--ink-soft); background: var(--paper); color: var(--ink); }
+.ws-dialog[open] { position: fixed; inset: 50% auto auto 50%; transform: translate(-50%, -50%); margin: 0; width: min(760px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow: auto; padding: clamp(20px, 4vw, 36px); border: 1px solid var(--ink-soft); background: var(--paper); color: var(--ink); }
+.ws-copy-table { min-width: 0; table-layout: fixed; }
+.ws-copy-table th:nth-child(1), .ws-copy-table td:nth-child(1) { width: 30%; }
+.ws-copy-table th:nth-child(2), .ws-copy-table td:nth-child(2) { width: 40%; }
+.ws-copy-table th:nth-child(3), .ws-copy-table td:nth-child(3) { width: 30%; }
+.ws-book-management-table { min-width: 1200px; table-layout: fixed; }
+.ws-book-management-table th:nth-child(1) { width: 23%; }
+.ws-book-management-table th:nth-child(2) { width: 17%; }
+.ws-book-management-table th:nth-child(3) { width: 14%; }
+.ws-book-management-table th:nth-child(4) { width: 11%; }
+.ws-book-management-table th:nth-child(5) { width: 10%; }
+.ws-book-management-table th:nth-child(6) { width: 11%; }
+.ws-book-management-table th:nth-child(7) { width: 14%; }
+.ws-book-management-table .book-management-id, .ws-book-management-table .ws-management-book-title { display: block; }
+.ws-book-management-table .book-management-id { margin-bottom: 6px; }
+.ws-catalog-book-table { min-width: 760px; table-layout: fixed; }
+.ws-catalog-book-table th:nth-child(1) { width: 40%; }
+.ws-catalog-book-table th:nth-child(2) { width: 20%; }
+.ws-catalog-book-table th:nth-child(3) { width: 18%; }
+.ws-catalog-book-table th:nth-child(4) { width: 22%; }
 .ws-dialog::backdrop { background: rgb(20 20 19 / .55); }
 .ws-dialog .ws-section-heading { margin-top: 0; }
 .ws-dialog h2 { font-family: var(--font-serif); font-size: 2rem; font-weight: 500; }

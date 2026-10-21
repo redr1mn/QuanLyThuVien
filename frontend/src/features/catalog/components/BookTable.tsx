@@ -6,7 +6,7 @@ export function BookTable({ books }: { books: BookListItem[] }) {
 
   return (
     <div className="ws-table-scroll" role="region" aria-label="Danh mục sách">
-      <table className="ws-table">
+      <table className="ws-table ws-catalog-book-table">
         <thead><tr><th>Hồ sơ / Tên sách</th><th>Xuất bản</th><th>Thể loại</th><th>Lưu thông</th></tr></thead>
         <tbody>{books.map((book) => <tr key={book.id}>
           <td><span className="library-record catalog-book-id">BK / {String(book.id).padStart(5, '0')}</span><Link className="book-table-link ws-book-title" to={`/books/${book.id}`}>{book.title}</Link><small>{book.author}</small></td>

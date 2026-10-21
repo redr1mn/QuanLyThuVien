@@ -13,10 +13,12 @@
 .library-nav .shell-dropdown-menu { right: auto; left: 0; }
 .shell-dropdown-menu .library-nav-link { justify-content: flex-start; padding: 12px; white-space: normal; }
 .library-account .shell-dropdown-menu { display: grid; gap: 12px; }
+.library-account > .shell-dropdown { display: flex; align-items: center; height: 100%; }
+.library-account-button { min-height: 3.5rem; padding-block: 0; }
 .library-workspace-links a.active { color: var(--oxblood); font-weight: 600; box-shadow: inset 0 -2px 0 currentColor; }
 .library-workspace-links a { justify-content: flex-start; }
 .library-page { max-width: none; }
-.library-page > h1 { font-size: clamp(2rem, 4vw, 3rem); }
+.library-page > h1 { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .ws-root fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
 .ws-full { grid-column: 1 / -1; }
 .ws-root input[type="checkbox"] { width: 18px; min-height: 18px; flex: 0 0 auto; }
@@ -29,7 +31,7 @@
 .bc-root button { border-radius: 0; cursor: pointer; }
 .bc-root button:disabled { cursor: not-allowed; }
 .bc-root .notice, .bc-root .loading-panel { margin: 24px; }
-.bc-folio { padding: 16px; width: min(960px, 100%); max-width: 100vw; max-height: 100dvh; border: 0; background: transparent; color: var(--ink); }
+.bc-folio[open] { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 16px; overflow: hidden; border: 0; background: transparent; color: var(--ink); }
 .bc-folio::backdrop { background: rgb(20 20 19 / .75); backdrop-filter: blur(2px); }
 .bc-folio > div { box-shadow: none; }
 .ws-table-scroll:focus-visible { outline: 2px solid var(--stamp); }
