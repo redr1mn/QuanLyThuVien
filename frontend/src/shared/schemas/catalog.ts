@@ -31,6 +31,16 @@ export const pagedBookResponseSchema = z.object({
   errors: z.array(apiErrorSchema),
 });
 
+export const bookDetailsSchema = z.object({
+  id: z.number(), isbn: z.string().nullable().optional(), title: z.string(), author: z.string(),
+  publisher: z.string().nullable().optional(), publishYear: z.number().nullable().optional(), description: z.string().nullable().optional(),
+  replacementPrice: z.number(), categoryId: z.number(), categoryName: z.string(),
+  copies: z.array(z.object({ id: z.number(), barcode: z.string(), shelfLocation: z.string(), status: z.string() })),
+});
+
+export const bookDetailsResponseSchema = z.object({ data: bookDetailsSchema.nullable(), errors: z.array(apiErrorSchema) });
+export type BookDetails = z.infer<typeof bookDetailsSchema>;
+
 export const categoryListResponseSchema = z.object({
   data: z.array(z.object({ id: z.number(), name: z.string(), slug: z.string() })).nullable(),
   errors: z.array(apiErrorSchema),

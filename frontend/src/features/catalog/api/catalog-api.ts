@@ -3,6 +3,7 @@ import type { PagedResult } from '../../../shared/api/api-envelope';
 import {
   categoryListResponseSchema,
   pagedBookResponseSchema,
+  bookDetailsResponseSchema,
   type BookListItem,
   type CatalogQuery,
 } from '../../../shared/schemas/catalog';
@@ -18,5 +19,12 @@ export const catalogApi = {
   async categories() {
     const response = await httpClient.get('/categories');
     return categoryListResponseSchema.parse(response.data).data ?? [];
+  },
+
+  async get(id: number) {
+    const response = await httpClient.get(`/books/${id}`);
+    const parsed = bookDetailsResponseSchema.parse(response.data);
+    if (!parsed.data) throw new Error('Chi tiết sách không tồn tại.');
+    return parsed.data;
   },
 };

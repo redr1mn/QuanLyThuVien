@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CatalogPage from '../../features/catalog/pages/CatalogPage';
+import BookDetailsPage from '../../features/catalog/pages/BookDetailsPage';
 import CirculationPage from '../../features/circulation/pages/CirculationPage';
 import MembersPage from '../../features/members/pages/MembersPage';
 import ReaderAccountPage from '../../features/reader-account/pages/ReaderAccountPage';
@@ -21,6 +22,7 @@ export function AppRoutes() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route index element={<CatalogPage />} />
+        <Route path="books/:id" element={<BookDetailsPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
       </Route>
