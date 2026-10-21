@@ -24,27 +24,40 @@ Frontend dùng Axios để gọi API, Zod để kiểm tra payload và Zustand �
 ## Yêu cầu
 
 - .NET SDK 10+
-- Node.js 18+
-- npm 9+
-- SQL Server local hoặc SQL Server instance có thể truy cập từ máy phát triển
+- Node.js 22+ và npm
+- SQL Server Express/Developer local hoặc SQL Server instance có thể truy cập
+  từ máy phát triển
 
-## Cài đặt
+## Cài đặt trên máy mới
+
+Clone repository rồi mở PowerShell tại thư mục gốc trước khi chạy các lệnh sau.
 
 ```powershell
+dotnet restore QuanLyThuVien.slnx
+dotnet tool restore
 cd frontend
 npm ci
 cd ..
-dotnet restore QuanLyThuVien.slnx
 ```
 
-Thiết lập SQL Server cho PowerShell hiện tại:
+`dotnet-ef` đã được pin theo EF Core 10 trong `.config/dotnet-tools.json`. Sau khi
+cài SQL Server và bảo đảm service đang chạy, đặt connection string cho instance
+SQL Server trong PowerShell:
 
 ```powershell
-$env:ConnectionStrings__LibraryDb = 'Server=.;Database=QuanLyThuVien;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True'
+$connectionString = 'Server=localhost\SQLEXPRESS;Database=QuanLyThuVien;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True'
+$env:ConnectionStrings__LibraryDb = $connectionString
 $env:LIBRARY_DB_CONNECTION = $env:ConnectionStrings__LibraryDb
+dotnet ef database update --project backend/QuanLyThuVien/QuanLyThuVien.csproj --startup-project backend/QuanLyThuVien/QuanLyThuVien.csproj
 ```
 
-Chi tiết migration, seed và xử lý lỗi xem [docs/sql-server-local.md](docs/sql-server-local.md).
+Thay `localhost\SQLEXPRESS` nếu instance trên máy có tên khác. Migration tạo
+database và schema; ứng dụng không tự chạy migration khi khởi động. Hướng dẫn
+đầy đủ về SQL Server, tài khoản development và lỗi thường gặp xem
+[docs/sql-server-local.md](docs/sql-server-local.md).
+
+Database mới không có sách mẫu: seed hiện chỉ tạo tài khoản development, còn
+catalog mẫu trong database local chưa được đóng gói thành script trong repository.
 
 ## Chạy local
 
@@ -53,8 +66,9 @@ Mở hai terminal.
 Terminal 1 — API:
 
 ```powershell
-cd backend/QuanLyThuVien
-dotnet run --launch-profile http
+$connectionString = 'Server=localhost\SQLEXPRESS;Database=QuanLyThuVien;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True'
+$env:ConnectionStrings__LibraryDb = $connectionString
+dotnet run --project backend/QuanLyThuVien/QuanLyThuVien.csproj --launch-profile http
 ```
 
 Terminal 2 — frontend:
@@ -67,6 +81,7 @@ npm run dev
 Mở **http://localhost:5173**. Vite proxy các request `/api` tới `http://localhost:5194`.
 
 Kiểm tra API trực tiếp tại `http://localhost:5194/api/health` hoặc `https://localhost:7244/api/health`.
+Để kiểm tra cả kết nối database, gọi `http://localhost:5194/api/categories`.
 
 `http://localhost:5194/` trả `404` có chủ đích vì backend chỉ là API.
 
@@ -80,7 +95,10 @@ $env:Library__DevelopmentSeedPassword = '<local-only-password>'
 dotnet run --project backend/QuanLyThuVien/QuanLyThuVien.csproj --launch-profile http
 ```
 
-Seed tạo các role `Reader`, `Staff`, `Admin` và các tài khoản tương ứng. Không commit password vào source control.
+Seed tạo các role `Reader`, `Staff`, `Admin` cùng các tài khoản `reader`, `staff`
+và `admin`; trên database mới, chúng dùng mật khẩu đã đặt trong biến môi trường.
+Seed không đặt lại mật khẩu của tài khoản đã tồn tại. Không commit password vào
+source control.
 
 ## Route frontend
 
