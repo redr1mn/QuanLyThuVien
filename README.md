@@ -110,3 +110,19 @@ dotnet build QuanLyThuVien.slnx
 ```
 
 Tài liệu chức năng chi tiết: [docs/library-functionality.md](docs/library-functionality.md).
+
+## Frontend — The Living Colophon
+
+Giao diện dùng nền giấy `#F4F1EA`, bề mặt `#E8E3D8`, lưới `#D2CBB8`, mực `#141413`, ghi chú `#5C5954`, điểm nhấn `#8C2D19` và dấu thư viện `#1E3A5F`. Ba giọng chữ: Newsreader, IBM Plex Mono và Inter (Google Fonts, có font hệ thống dự phòng).
+
+- `/staff/books`: Staff/Admin biên mục, cập nhật đầu sách và nhập bản sao theo barcode/kệ.
+- `/staff/readers`: tìm kiếm, phân trang, thêm/sửa hồ sơ, đổi trạng thái và hạn thẻ qua `PUT /api/members/{id}`.
+- `/staff/circulation`: chọn thẻ Active, tra đầu sách và chọn bản sao Available; hạn trả tối đa 7 ngày. Trả toàn bộ bản sao trong phiếu theo contract backend, với Normal/Damaged/Lost. Tiền phạt lấy từ biên nhận API.
+- `/admin/reports`: chọn kỳ, số liệu tổng quan, xếp hạng sách và in báo cáo.
+- `/admin/users`: phân trang, khóa/mở khóa và đổi vai trò.
+
+Contract nguồn là các DTO/controller trong `backend/QuanLyThuVien`: envelope thực tế `{ data, errors }`; trạng thái bản sao gồm cả `Reserved` và `Damaged`. Frontend dùng cookie qua Axios, dữ liệu nghiệp vụ trong Zustand, không lưu dữ liệu thư viện ở localStorage.
+
+Kiểm thử bổ sung `frontend/tests/backend-contracts.test.mjs` chạy trực tiếp schema production, kiểm tra trạng thái bản sao/thẻ, dữ liệu biên mục, bản sao trùng và biên thời hạn 7 ngày. Chạy `npm test`, `npm run typecheck`, `npm run build` trong `frontend/`. Kiểm thử thao tác thật cần backend ở cổng 5194, SQL Server đã cấu hình và tài khoản Staff/Admin.
+
+Chi tiết nguồn frontend cũ được chuyển, các file CSS sao chép nguyên bản và khác biệt do contract backend: [Chuyển giao diện từ qlthuvien_old](docs/frontend-legacy-migration.md).

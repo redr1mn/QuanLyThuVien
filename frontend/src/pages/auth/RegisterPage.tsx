@@ -1,3 +1,4 @@
+import { AuthFrame } from '../../app/layouts/AuthFrame';
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerInputSchema } from '../../features/auth/schemas/auth';
@@ -26,9 +27,9 @@ export default function RegisterPage() {
 
   const update = (field: keyof typeof form, value: string) => setForm({ ...form, [field]: value });
 
-  return <section className="auth-page auth-page-wide" aria-labelledby="register-title">
+  return <AuthFrame><section aria-labelledby="register-title">
     <div className="auth-intro"><span className="eyebrow">Thẻ độc giả</span><h1 id="register-title">Mở tài khoản thư viện</h1><p>Điền thông tin cơ bản. Hệ thống sẽ tạo thẻ Reader tự động sau khi đăng ký.</p></div>
-    <div className="auth-card">
+    <div className="legacy-auth-form-card">
       {(validationError || error) && <p className="notice notice-error" role="alert">{validationError ?? error}</p>}
       <form className="auth-form auth-form-grid" onSubmit={submit}>
         <div className="form-field"><label htmlFor="register-name">Họ và tên</label><input id="register-name" value={form.fullName} onChange={(event) => update('fullName', event.target.value)} autoComplete="name" /></div>
@@ -42,5 +43,5 @@ export default function RegisterPage() {
       </form>
     </div>
     <p className="auth-switch">Đã có tài khoản? <Link to="/login">Đăng nhập</Link></p>
-  </section>;
+  </section></AuthFrame>;
 }

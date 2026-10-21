@@ -7,6 +7,7 @@ import type { AuthSession, LoginInput, RegisterInput } from '../schemas/auth';
 type AuthState = {
   user: AuthSession | null;
   isLoading: boolean;
+  hasCheckedSession: boolean;
   error: string | null;
   loadSession: () => Promise<void>;
   login: (input: LoginInput) => Promise<boolean>;
@@ -25,21 +26,22 @@ const messageFromError = (error: unknown) => {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: false,
+  hasCheckedSession: false,
   error: null,
   loadSession: async () => {
     set({ isLoading: true, error: null });
     try {
-      set({ user: await authApi.me(), isLoading: false });
+      set({ user: await authApi.me(), isLoading: false, hasCheckedSession: true });
     } catch (error) {
       // A missing session is a normal public-route state. Only form actions surface API errors.
-      set({ user: null, isLoading: false, error: null });
+      set({ user: null, isLoading: false, error: null, hasCheckedSession: true });
     }
   },
   login: async (input) => {
     set({ isLoading: true, error: null });
     try {
       const user = await authApi.login(input);
-      set({ user, isLoading: false });
+      set({ user, isLoading: false, hasCheckedSession: true });
       return true;
     } catch (error) {
       set({ user: null, isLoading: false, error: messageFromError(error) });

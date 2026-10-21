@@ -1,3 +1,4 @@
+import { AuthFrame } from '../../app/layouts/AuthFrame';
 import { FormEvent, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { loginInputSchema } from '../../features/auth/schemas/auth';
@@ -26,9 +27,9 @@ export default function LoginPage() {
     }
   }
 
-  return <section className="auth-page" aria-labelledby="login-title">
-    <div className="auth-intro"><span className="eyebrow">Không gian đọc</span><h1 id="login-title">Đăng nhập để tiếp tục</h1><p>Quản lý sách đang mượn, lịch sử và quyền truy cập thư viện của bạn.</p></div>
-    <div className="auth-card">
+  return <AuthFrame><section aria-labelledby="login-title">
+    <div className="auth-intro"><span className="eyebrow">Không gian đọc</span><h1 id="login-title">Đăng nhập</h1><p>Sử dụng tài khoản thư viện để tiếp tục.</p></div>
+    <div className="legacy-auth-form-card">
       {registeredCardNumber && <p className="notice notice-success" role="status">Đăng ký thành công. Số thẻ của bạn là <strong>{registeredCardNumber}</strong>. Hãy đăng nhập để bắt đầu.</p>}
       {(validationError || error) && <p className="notice notice-error" role="alert">{validationError ?? error}</p>}
       <form className="auth-form" onSubmit={submit}>
@@ -39,5 +40,5 @@ export default function LoginPage() {
       </form>
     </div>
     <p className="auth-switch">Chưa có tài khoản? <Link to="/register">Đăng ký tài khoản Reader</Link></p>
-  </section>;
+  </section></AuthFrame>;
 }

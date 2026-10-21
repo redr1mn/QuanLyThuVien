@@ -28,7 +28,7 @@ export default function BookDetailsPage() {
     {!isLoading && !error && book && <article className="book-details">
       <div><span className="eyebrow">{book.categoryName}</span><h1 id="book-details-title">{book.title}</h1><p className="book-details-author">{book.author}</p><p className="book-details-description">{book.description || 'Chưa có mô tả cho đầu sách này.'}</p></div>
       <dl className="book-details-meta"><div><dt>Nhà xuất bản</dt><dd>{book.publisher || '—'}</dd></div><div><dt>Năm xuất bản</dt><dd>{book.publishYear || '—'}</dd></div><div><dt>ISBN</dt><dd>{book.isbn || '—'}</dd></div><div><dt>Bản sao sẵn sàng</dt><dd>{book.copies.filter(copy => copy.status === 'Available').length} / {book.copies.length}</dd></div></dl>
-      <section className="book-copy-list" aria-labelledby="book-copies-title"><h2 id="book-copies-title">Các bản sao</h2>{book.copies.length ? <ul>{book.copies.map(copy => <li key={copy.id}><span>{copy.barcode}</span><span>Kệ {copy.shelfLocation}</span><strong>{copy.status === 'Available' ? 'Có sẵn' : copy.status}</strong></li>)}</ul> : <p>Chưa có bản sao được nhập.</p>}</section>
+      <section className="book-copy-list" aria-labelledby="book-copies-title"><h2 id="book-copies-title">Các bản sao</h2>{book.copies.length ? <ul>{book.copies.map(copy => <li key={copy.id}><span>{copy.barcode}</span><span className="ws-shelf">Kệ {copy.shelfLocation}</span><strong className={`ws-stamp ${copy.status === 'Available' ? '' : 'ws-danger'}`}>{{ Available: 'Còn sách', OnLoan: 'Đang mượn', Reserved: 'Đã giữ chỗ', Lost: 'Mất sách', Damaged: 'Hư hỏng' }[copy.status]}</strong></li>)}</ul> : <p>Chưa có bản sao được nhập.</p>}</section>
     </article>}
   </section>;
 }

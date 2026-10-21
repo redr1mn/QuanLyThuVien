@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CatalogPage from '../../features/catalog/pages/CatalogPage';
+import BookManagementPage from '../../features/catalog/pages/BookManagementPage';
 import BookDetailsPage from '../../features/catalog/pages/BookDetailsPage';
 import CirculationPage from '../../features/circulation/pages/CirculationPage';
 import MembersPage from '../../features/members/pages/MembersPage';
@@ -27,6 +28,7 @@ export function AppRoutes() {
         <Route path="register" element={<RegisterPage />} />
       </Route>
       <Route element={<RequireRole><AuthenticatedLayout /></RequireRole>}>
+        <Route path="staff/books" element={<RequireRole roles={['Staff', 'Admin']}><BookManagementPage /></RequireRole>} />
         <Route path="reader/account" element={<RequireRole roles={['Reader']}><ReaderAccountPage /></RequireRole>} />
         <Route path="staff/readers" element={<RequireRole roles={['Staff', 'Admin']}><MembersPage /></RequireRole>} />
         <Route path="staff/circulation" element={<RequireRole roles={['Staff', 'Admin']}><CirculationPage /></RequireRole>} />

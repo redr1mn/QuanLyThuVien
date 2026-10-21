@@ -7,6 +7,8 @@ type AdminState = {
   dashboard: Awaited<ReturnType<typeof adminApi.dashboard>> | null;
   users: AdminUser[];
   totalUsers: number;
+  page: number;
+  pageSize: number;
   isLoading: boolean;
   error: string | null;
   loadDashboard: () => Promise<void>;
@@ -16,7 +18,7 @@ type AdminState = {
 };
 
 export const useAdminStore = create<AdminState>((set) => ({
-  dashboard: null, users: [], totalUsers: 0, isLoading: false, error: null,
+  dashboard: null, users: [], totalUsers: 0, page: 1, pageSize: 20, isLoading: false, error: null,
   loadDashboard: async () => {
     set({ isLoading: true, error: null });
     try { set({ dashboard: await adminApi.dashboard(), isLoading: false }); }
@@ -26,7 +28,7 @@ export const useAdminStore = create<AdminState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const result = await adminApi.users(query, page);
-      set({ users: result.items, totalUsers: result.totalCount, isLoading: false });
+      set({ users: result.items, totalUsers: result.totalCount, page: result.page, pageSize: result.pageSize, isLoading: false });
     } catch (error) { set({ isLoading: false, error: getApiErrorMessage(error) }); }
   },
   setStatus: async (id, isActive) => {

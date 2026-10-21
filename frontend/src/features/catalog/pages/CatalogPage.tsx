@@ -1,30 +1,40 @@
 import { useEffect, useState } from 'react';
-import { BookTable } from '../components/BookTable';
+import { useNavigate } from 'react-router-dom';
+import BookCatalog, { type Book } from '../components/BookCatalog';
 import { useCatalogStore } from '../store/catalog-store';
+import { useAuthStore } from '../../auth/store/auth-store';
+import { useReaderAccountStore } from '../../reader-account/store/reader-account-store';
+import { useReservationsStore } from '../../reservations/store/reservations-store';
 
 export default function CatalogPage() {
-  const { items, isLoading, error, query, availableOnly, page, pageSize, totalCount, load, resetFilters } = useCatalogStore();
+  const store = useCatalogStore();
+  const { items, query, load, loadCategories, totalCount } = store;
+  const { user } = useAuthStore();
+  const reservations = useReservationsStore();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState(query);
-
-  useEffect(() => { void load(); }, [load]);
+  const [receipts, setReceipts] = useState<Record<number, { kind: 'reserve'; date: string }>>({});
+  useEffect(() => { void load({ page: 1, pageSize: 6 }); void loadCategories(); return () => { void useCatalogStore.getState().openBook(null); }; }, [load, loadCategories]);
   useEffect(() => {
     const timer = setTimeout(() => { if (searchTerm !== query) void load({ query: searchTerm, page: 1 }); }, 350);
     return () => clearTimeout(timer);
   }, [load, query, searchTerm]);
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  const hasFilters = Boolean(searchTerm || availableOnly);
-
-  return <section className="catalog-page" aria-labelledby="catalog-title">
-    <div className="catalog-heading"><div><span className="eyebrow">Danh mục thư viện</span><h1 id="catalog-title">Tra cứu sách</h1></div><span className="catalog-count">{totalCount} đầu sách</span></div>
-    <div className="catalog-toolbar" role="search">
-      <label className="search-field"><span>Tìm trong thư viện</span><input aria-label="Tìm sách" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Tên sách hoặc tác giả" /></label>
-      <label className="availability-toggle"><input type="checkbox" checked={availableOnly} onChange={(event) => void load({ availableOnly: event.target.checked, page: 1 })} /> <span>Chỉ hiện sách còn</span></label>
-      {hasFilters && <button className="secondary-button" type="button" onClick={() => { setSearchTerm(''); resetFilters(); void load({ query: '', availableOnly: false, page: 1 }); }}>Đặt lại bộ lọc</button>}
-    </div>
-    <div className="catalog-results-heading"><span>{isLoading ? 'Đang cập nhật kết quả…' : `Hiển thị ${items.length} trong ${totalCount} đầu sách`}</span>{query && <span>Từ khoá: “{query}”</span>}</div>
-    {isLoading && <div className="loading-panel" role="status"><span className="loading-dot" />Đang tải danh mục…</div>}
-    {error && <div className="notice notice-error" role="alert"><strong>Không thể tải danh mục</strong><span>{error}</span><button className="secondary-button" type="button" onClick={() => void load()}>Thử lại</button></div>}
-    {!isLoading && !error && <><BookTable books={items} /><div className="catalog-pagination"><button className="secondary-button" disabled={page <= 1} onClick={() => void load({ page: page - 1 })}>Trang trước</button><span>Trang {page} / {totalPages}</span><button className="secondary-button" disabled={page >= totalPages} onClick={() => void load({ page: page + 1 })}>Trang sau</button></div></>}
-  </section>;
+  const books: Book[] = items.map(book => ({ id: book.id, title: book.title, author: book.author, category: book.categoryName, publisher: book.publisher || '—', publishYear: book.publishYear ?? '—', price: book.replacementPrice, location: `HS-${String(book.id).padStart(3, '0')}`, availableQuantity: book.availableCopies, totalQuantity: book.totalCopies, coverImage: book.coverImage || '', description: '' }));
+  const selectedBase = books.find(book => book.id === store.selectedId) ?? null;
+  const detail = store.selectedBook;
+  const selected: Book | null = selectedBase ? { ...selectedBase, ...(detail ? { description: detail.description || 'Chưa có ghi chú lưu trữ.', location: [...new Set(detail.copies.map(copy => copy.shelfLocation))].join(' · ') || 'Chưa nhập bản sao', totalQuantity: detail.copies.length, availableQuantity: detail.copies.filter(copy => copy.status === 'Available').length } : { description: 'Đang tải ghi chú lưu trữ…' }) } : null;
+  const canBorrow = user?.role === 'Staff' || user?.role === 'Admin';
+  async function action(book: Book) {
+    if (book.availableQuantity > 0 && canBorrow) { await store.openBook(null); navigate(`/staff/circulation?tab=borrow&book=${book.id}`); return; }
+    if (!user) { await store.openBook(null); navigate('/login?returnUrl=/'); return; }
+    if (user.role !== 'Reader') { useReservationsStore.setState({ error: 'Đặt trước cần thực hiện bằng tài khoản độc giả.' }); return; }
+    const accountStore = useReaderAccountStore.getState();
+    await accountStore.load();
+    const account = useReaderAccountStore.getState().account;
+    if (!account) { useReservationsStore.setState({ error: useReaderAccountStore.getState().error || 'Không tải được hồ sơ thẻ.' }); return; }
+    if (await reservations.create(account.profile.id, book.id)) setReceipts(previous => ({ ...previous, [book.id]: { kind: 'reserve', date: new Date().toLocaleDateString('vi-VN') } }));
+  }
+  return <BookCatalog books={books} categories={store.categories} totalCount={totalCount} page={store.page} pageSize={store.pageSize} query={searchTerm} category={store.categoryId ? String(store.categoryId) : ''} availability={store.availableOnly ? 'available' : 'all'} isLoading={store.isLoading} error={store.error} categoryError={store.categoryError} selected={selected} detailLoading={store.detailLoading} detailError={store.detailError} selectedIsbn={detail?.isbn} isSaving={reservations.isLoading} actionError={reservations.error} receipt={selected ? receipts[selected.id] : undefined} canBorrow={canBorrow}
+    onQuery={setSearchTerm} onCategory={value => void load({ categoryId: value ? Number(value) : undefined, page: 1 })} onAvailability={value => void load({ availableOnly: value === 'available', page: 1 })} onPage={page => void load({ page })} onReset={() => { setSearchTerm(''); store.resetFilters(); void load({ query: '', categoryId: undefined, availableOnly: false, page: 1 }); }} onRetry={() => void load()} onRetryCategories={() => void loadCategories()} onSelect={id => { useReservationsStore.setState({ error: null }); void store.openBook(id); }} onAction={book => void action(book)}
+    copyList={detail && <section className="mt-6"><h3 className="font-mono text-xs uppercase tracking-wider">Bản sao / Tọa độ kệ</h3><ul className="mt-2 border-t border-[#D2CBB8]">{detail.copies.map(copy => <li className="flex flex-wrap justify-between gap-2 border-b border-[#D2CBB8] py-2 font-mono text-xs" key={copy.id}><span>{copy.barcode}</span><span className="text-[#1E3A5F]">{copy.shelfLocation}</span><span className={copy.status === 'Available' ? 'text-[#1E3A5F]' : 'text-[#8C2D19]'}>{{ Available: 'Còn sách', OnLoan: 'Đang mượn', Reserved: 'Đã giữ chỗ', Lost: 'Mất sách', Damaged: 'Hư hỏng' }[copy.status]}</span></li>)}</ul>{!detail.copies.length && <p className="mt-2 text-sm text-[#5C5954]">Chưa có bản sao trong kho.</p>}</section>} />;
 }

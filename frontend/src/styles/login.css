@@ -1,0 +1,99 @@
+/* The Living Colophon: nền giấy, hộc phiếu, serif cho tiêu đề và sans cho thao tác. */
+.library-auth {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    min-height: 680px;
+}
+.library-auth-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 40px;
+    padding: clamp(24px, 4vw, 64px);
+    border-right: 1px solid var(--rule);
+    background: var(--paper-deep);
+}
+.library-auth-back { color: var(--stamp); text-underline-offset: 5px; font-size: .875rem; }
+.library-auth-art { display: block; width: 180px; max-width: 100%; margin-bottom: 24px; color: var(--oxblood); }
+.library-auth-intro h2,
+.library-auth-panel h1 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -.025em;
+}
+.library-auth-intro h2 { margin: 0 0 20px; font-size: clamp(2rem, 3.5vw, 3.25rem); }
+.library-auth-intro h2 em { font-weight: 400; color: var(--ink-soft); }
+.library-auth-intro p { max-width: 45ch; margin: 0; line-height: 1.75; color: var(--ink-soft); }
+.library-auth-intro .library-auth-help { padding-top: 24px; border-top: 1px solid var(--rule); font-size: .875rem; }
+.library-auth-panel { display: flex; align-items: center; justify-content: center; padding: clamp(24px, 5vw, 80px); min-width: 0; }
+.library-auth-form-wrap { width: 100%; max-width: 460px; }
+.library-auth-panel h1 { margin: 0 0 12px; font-size: clamp(2.5rem, 4vw, 3.5rem); }
+.library-auth-lead { margin: 0 0 32px; color: var(--ink-soft); line-height: 1.6; }
+.library-auth-form { display: grid; gap: 20px; }
+.library-auth-field { display: grid; gap: 8px; }
+.library-auth-field label { font-size: .875rem; font-weight: 500; }
+.library-auth-field input {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 0;
+    background: var(--paper-deep);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+}
+.library-auth-field input::placeholder { color: var(--ink-soft); }
+.library-auth-field input:focus-visible { outline: 2px solid var(--stamp); outline-offset: 2px; }
+.library-auth-field input.input-validation-error { border-color: var(--oxblood); }
+.library-auth-password { display: flex; border: 1px solid var(--rule); background: var(--paper-deep); }
+.library-auth-password input { border: 0; flex: 1; }
+.library-auth-password button { flex: none; min-width: 64px; padding: 0 12px; border: 0; border-left: 1px solid var(--rule); background: transparent; color: var(--stamp); font: inherit; font-size: .875rem; }
+.library-auth-remember { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; cursor: pointer; font-size: .875rem; }
+.library-auth-remember input { width: 18px; height: 18px; margin: 0; accent-color: var(--oxblood); flex: none; }
+.library-auth-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 24px;
+    border: 0;
+    border-radius: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font: inherit;
+    font-weight: 500;
+    text-decoration: none;
+}
+.library-auth-submit:hover { background: var(--stamp); color: var(--paper); }
+.library-auth-submit:disabled { background: var(--ink-soft); cursor: not-allowed; }
+.library-auth-signout { min-height: 44px; margin-top: 12px; border: 0; background: transparent; color: var(--stamp); text-decoration: underline; text-underline-offset: 4px; font: inherit; }
+.library-auth-errors.validation-summary-valid,
+.library-auth-field-error.field-validation-valid { display: none; }
+.library-auth-errors,
+.library-auth-notice { padding: 12px 16px; border-left: 2px solid var(--oxblood); background: var(--paper-deep); color: var(--oxblood); font-size: .875rem; line-height: 1.6; }
+.library-auth-errors ul { margin: 0; padding: 0; list-style: none; }
+.library-auth-field-error { color: var(--oxblood); font-size: .8125rem; }
+.library-auth-demo { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.library-auth-demo h2 { margin: 0 0 8px; font-family: var(--font-sans); font-size: .875rem; font-weight: 600; }
+.library-auth-demo p { margin: 0 0 12px; color: var(--ink-soft); font-size: .8125rem; line-height: 1.65; }
+.library-auth-demo code,
+.library-auth-demo-options span { font-family: var(--font-mono); font-size: .75rem; font-variant-numeric: tabular-nums; color: var(--stamp); }
+.library-auth-demo-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.library-auth-demo-options button { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 64px; padding: 12px; border: 1px solid var(--rule); background: transparent; color: var(--ink); font: inherit; font-size: .8125rem; }
+.library-auth-demo-options button:hover,
+.library-auth-demo-options button[aria-pressed="true"] { border-color: var(--oxblood); background: var(--paper-deep); }
+.library-auth-demo .library-auth-demo-note { margin-top: 12px; margin-bottom: 0; }
+@media (max-width: 767.98px) {
+    .library-auth { grid-template-columns: 1fr; min-height: 0; }
+    .library-auth-intro { gap: 24px; border-right: 0; border-bottom: 1px solid var(--rule); }
+    .library-auth-art { display: none; }
+    .library-auth-intro h2 br { display: none; }
+    .library-auth-panel { padding: 32px 24px 40px; }
+}
+@media (max-width: 359.98px) {
+    .library-auth-demo-options { grid-template-columns: 1fr; }
+}

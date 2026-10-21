@@ -5,7 +5,7 @@ import fs from 'node:fs';
 const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
 test('shared app shell exposes role-aware navigation and logout', () => {
-  const shell = read('src/app/layouts/AuthenticatedLayout.tsx');
+  const shell = read('src/app/layouts/AuthenticatedLayout.tsx') + read('src/app/layouts/LibraryShell.tsx');
   assert.match(shell, /useAuthStore/);
   assert.match(shell, /Đăng xuất/);
   assert.match(shell, /aria-current/);
@@ -22,11 +22,11 @@ test('auth forms expose password visibility and registration success feedback', 
 });
 
 test('catalog UX includes debounced search and explicit result states', () => {
-  const catalog = read('src/features/catalog/pages/CatalogPage.tsx');
+  const catalog = read('src/features/catalog/pages/CatalogPage.tsx') + read('src/features/catalog/components/BookCatalog.tsx');
   assert.match(catalog, /setTimeout/);
   assert.match(catalog, /Thử lại/);
   assert.match(catalog, /totalCount/);
-  assert.match(catalog, /Đặt lại bộ lọc/);
+  assert.match(catalog, /Xóa bộ lọc/);
 });
 
 test('API connectivity errors explain how to start the backend', () => {
